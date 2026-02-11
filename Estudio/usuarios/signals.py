@@ -1,10 +1,4 @@
-"""
-Señales de la aplicación usuarios.
-
-Maneja el envío automático de email de activación cuando
-se crea un usuario nuevo desde el admin.
-"""
-
+# Señales de la aplicación usuarios. Maneja el envío automático de email de activación cuando se crea un usuario nuevo desde el admin.
 import logging
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -14,7 +8,6 @@ from django.utils.html import strip_tags
 from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
-
 from .models import Usuario, TokenActivacion
 
 logger = logging.getLogger(__name__)
@@ -22,18 +15,8 @@ logger = logging.getLogger(__name__)
 
 @receiver(post_save, sender=Usuario)
 def enviar_email_activacion(sender, instance, created, **kwargs):
-    """
-    Enviar email de activación cuando se crea un nuevo usuario.
-
-    Solo se envía si el usuario fue recién creado y está en estado 'pendiente'.
-    Genera un token de activación y envía el email con el link correspondiente.
-
-    Args:
-        sender: Clase del modelo (Usuario).
-        instance: Instancia del usuario creado.
-        created: Boolean indicando si es una creación nueva.
-        **kwargs: Argumentos adicionales de la señal.
-    """
+    # Solo se envía si el usuario fue recién creado y está en estado 'pendiente'.
+    # Genera un token de activación y envía el email con el link correspondiente.
     if created and instance.estado == 'pendiente' and not instance.is_superuser:
         try:
             # Crear o actualizar token de activación

@@ -1,32 +1,13 @@
-"""
-Configuración de Django para el proyecto Estudio.
-
-Archivo de configuración principal con soporte para desarrollo local (SQLite)
-y producción en Render (PostgreSQL).
-
-Utiliza python-decouple para manejo seguro de variables de entorno.
-"""
-
 import os
 from pathlib import Path
 from decouple import config, Csv
 import dj_database_url
 
-# =============================================================================
-# RUTAS BASE
-# =============================================================================
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# =============================================================================
-# SEGURIDAD
-# =============================================================================
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-cambiar-en-produccion')
 DEBUG = config('DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
 
-# =============================================================================
-# APLICACIONES INSTALADAS
-# =============================================================================
 DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -48,9 +29,6 @@ LOCAL_APPS = [
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
 
-# =============================================================================
-# MIDDLEWARE
-# =============================================================================
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -68,9 +46,6 @@ if not DEBUG:
 
 ROOT_URLCONF = 'Estudio.urls'
 
-# =============================================================================
-# TEMPLATES
-# =============================================================================
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -90,10 +65,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'Estudio.wsgi.application'
 ASGI_APPLICATION = 'Estudio.asgi.application'
 
-# =============================================================================
-# BASE DE DATOS
-# Desarrollo: SQLite | Producción: PostgreSQL (Render)
-# =============================================================================
 if DEBUG:
     DATABASES = {
         'default': {
@@ -110,21 +81,12 @@ else:
         )
     }
 
-# =============================================================================
-# MODELO DE USUARIO PERSONALIZADO
-# =============================================================================
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
-# =============================================================================
-# BACKENDS DE AUTENTICACIÓN
-# =============================================================================
 AUTHENTICATION_BACKENDS = [
     'usuarios.backends.EmailBackend',
 ]
 
-# =============================================================================
-# VALIDADORES DE CONTRASEÑA
-# =============================================================================
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
@@ -146,16 +108,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# =============================================================================
-# URLS DE AUTENTICACIÓN
-# =============================================================================
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 
-# =============================================================================
-# INTERNACIONALIZACIÓN Y LOCALIZACIÓN
-# =============================================================================
 LANGUAGE_CODE = 'es'
 TIME_ZONE = 'America/Argentina/Buenos_Aires'
 USE_I18N = True
@@ -168,16 +124,12 @@ DATETIME_FORMAT = 'd/m/Y H:i:s'
 SHORT_DATE_FORMAT = 'd/m/Y'
 SHORT_DATETIME_FORMAT = 'd/m/Y H:i'
 
-# =============================================================================
-# ARCHIVOS ESTÁTICOS (CSS, JavaScript, Imágenes)
-# =============================================================================
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
-# Configuración de almacenamiento
 if DEBUG:
     # En desarrollo: configuración estándar de Django
     STORAGES = {
@@ -199,15 +151,8 @@ else:
         },
     }
 
-# =============================================================================
-# ARCHIVOS MEDIA (Subidos por usuarios)
-# =============================================================================
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-
-# =============================================================================
-# CONFIGURACIÓN DE EMAIL (Outlook/SMTP)
-# =============================================================================
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = config('EMAIL_HOST', default='smtp-mail.outlook.com')
 EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
@@ -220,9 +165,6 @@ DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@estudio.com')
 if DEBUG and not EMAIL_HOST_USER:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# =============================================================================
-# CACHÉ
-# =============================================================================
 if DEBUG:
     CACHES = {
         'default': {
@@ -241,9 +183,6 @@ else:
         }
     }
 
-# =============================================================================
-# SEGURIDAD EN PRODUCCIÓN
-# =============================================================================
 if not DEBUG:
     # HTTPS
     SECURE_SSL_REDIRECT = True
@@ -278,10 +217,6 @@ if not DEBUG:
 # =============================================================================
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# =============================================================================
-# CONFIGURACIÓN PARA RENDER.COM
-# =============================================================================
-# Esta configuración se activa automáticamente cuando el proyecto se ejecuta en Render
 import os
 import dj_database_url
 
@@ -322,15 +257,8 @@ if 'RENDER' in os.environ:
         },
     }
 
-# =============================================================================
-# CONFIGURACIÓN DE SESIÓN
-# =============================================================================
 SESSION_COOKIE_AGE = 86400  # 24 horas
 SESSION_SAVE_EVERY_REQUEST = True
-
-# =============================================================================
-# LOGGING
-# =============================================================================
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

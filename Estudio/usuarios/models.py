@@ -1,10 +1,3 @@
-"""
-Modelos de la aplicación usuarios.
-
-Incluye el modelo de Usuario personalizado y el modelo de TokenActivacion
-para el sistema de verificación por email e invitación.
-"""
-
 import uuid
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
@@ -15,20 +8,11 @@ from .managers import UsuarioManager
 
 
 class Usuario(AbstractBaseUser, PermissionsMixin):
-    """
-    Modelo de usuario personalizado que usa email como identificador principal.
-
-    Hereda de AbstractBaseUser y PermissionsMixin para compatibilidad completa
-    con el sistema de autenticación y permisos de Django.
-    """
-
     class Estado(models.TextChoices):
-        """Opciones de estado del usuario."""
         PENDIENTE = 'pendiente', 'Pendiente'
         VERIFICADO = 'verificado', 'Verificado'
 
     class Rol(models.TextChoices):
-        """Opciones de rol del usuario."""
         ADMINISTRADOR = 'Administrador', 'Administrador'
         COLABORADOR = 'Colaborador', 'Colaborador'
         CLIENTE = 'Cliente', 'Cliente'
@@ -95,28 +79,17 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         ]
 
     def get_full_name(self):
-        """Retorna el nombre completo del usuario."""
         return f'{self.nombre} {self.apellido}'.strip()
 
     def get_short_name(self):
-        """Retorna el nombre corto del usuario."""
         return self.nombre
 
     def __str__(self):
-        """Representación en texto del usuario."""
         return self.email
 
 
 class TokenActivacion(models.Model):
-    """
-    Token para verificación de email y establecimiento de contraseña.
-
-    Se genera automáticamente al crear un usuario nuevo y tiene una
-    validez de 24 horas. También se utiliza para recuperación de contraseña.
-    """
-
     class TipoToken(models.TextChoices):
-        """Tipos de token disponibles."""
         ACTIVACION = 'activacion', 'Activación de cuenta'
         RECUPERACION = 'recuperacion', 'Recuperación de contraseña'
 
@@ -146,7 +119,6 @@ class TokenActivacion(models.Model):
         verbose_name_plural = 'tokens de activación'
 
     def save(self, *args, **kwargs):
-        """Establecer fecha de expiración si no se ha definido."""
         if not self.expira_en:
             self.expira_en = timezone.now() + timedelta(hours=24)
         if not self.token:

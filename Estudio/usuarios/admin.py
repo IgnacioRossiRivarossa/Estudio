@@ -1,13 +1,5 @@
-"""
-Configuración del admin para la aplicación usuarios.
-
-Incluye la configuración del modelo Usuario personalizado con
-fieldsets organizados, acciones personalizadas e inline de empresas.
-"""
-
 import uuid
 from datetime import timedelta
-
 from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -16,29 +8,21 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.html import strip_tags
-
 from .models import Usuario, TokenActivacion
 
-
 class EmpresaUsuarioInline(admin.TabularInline):
-    """Inline para gestionar empresas asociadas al usuario."""
-
     model = Usuario.empresas.through
     extra = 1
     verbose_name = 'empresa asociada'
     verbose_name_plural = 'empresas asociadas'
     autocomplete_fields = ['empresa']
 
-
 class UsuarioCreationForm(forms.ModelForm):
-    """Formulario para crear usuarios nuevos sin contraseña."""
-
     class Meta:
         model = Usuario
         fields = ('email', 'nombre', 'apellido', 'rol', 'is_active', 'is_staff')
 
     def save(self, commit=True):
-        """Guardar usuario con contraseña no usable."""
         user = super().save(commit=False)
         user.set_unusable_password()
         if commit:
@@ -47,7 +31,6 @@ class UsuarioCreationForm(forms.ModelForm):
 
 
 class UsuarioChangeForm(forms.ModelForm):
-    """Formulario para editar usuarios existentes."""
 
     class Meta:
         model = Usuario
@@ -56,13 +39,6 @@ class UsuarioChangeForm(forms.ModelForm):
 
 @admin.register(Usuario)
 class UsuarioAdmin(BaseUserAdmin):
-    """
-    Configuración del admin para el modelo Usuario personalizado.
-
-    Incluye listado, filtros, búsqueda, fieldsets organizados,
-    inline de empresas y acciones personalizadas.
-    """
-
     form = UsuarioChangeForm
     add_form = UsuarioCreationForm
 
@@ -123,18 +99,11 @@ class UsuarioAdmin(BaseUserAdmin):
     ]
 
     def get_inline_instances(self, request, obj=None):
-        """Solo mostrar inlines cuando se edita un usuario existente."""
         if not obj:
             return []
         return super().get_inline_instances(request, obj)
 
     def save_model(self, request, obj, form, change):
-        """
-        Guardar modelo de usuario.
-
-        Si es un usuario nuevo (creación), se establece contraseña no usable
-        y se deja que la señal post_save envíe el email de activación.
-        """
         if not change:
             # Usuario nuevo: sin contraseña (se establecerá al activar)
             obj.set_unusable_password()
@@ -142,11 +111,6 @@ class UsuarioAdmin(BaseUserAdmin):
 
     @admin.action(description='Enviar email de activación')
     def enviar_email_activacion(self, request, queryset):
-        """
-        Acción para enviar email de activación a usuarios seleccionados.
-
-        Genera un nuevo token y envía el email de activación.
-        """
         enviados = 0
         for usuario in queryset:
             try:
@@ -209,7 +173,6 @@ class UsuarioAdmin(BaseUserAdmin):
 
     @admin.action(description='Activar usuarios seleccionados')
     def activar_usuarios(self, request, queryset):
-        """Activar usuarios seleccionados."""
         cantidad = queryset.update(is_active=True)
         self.message_user(
             request,
@@ -218,7 +181,6 @@ class UsuarioAdmin(BaseUserAdmin):
 
     @admin.action(description='Desactivar usuarios seleccionados')
     def desactivar_usuarios(self, request, queryset):
-        """Desactivar usuarios seleccionados."""
         cantidad = queryset.update(is_active=False)
         self.message_user(
             request,
@@ -228,8 +190,6 @@ class UsuarioAdmin(BaseUserAdmin):
 
 @admin.register(TokenActivacion)
 class TokenActivacionAdmin(admin.ModelAdmin):
-    """Configuración del admin para tokens de activación."""
-
     list_display = ['usuario', 'tipo', 'creado_en', 'expira_en', 'esta_expirado']
     list_filter = ['tipo', 'creado_en']
     search_fields = ['usuario__email']

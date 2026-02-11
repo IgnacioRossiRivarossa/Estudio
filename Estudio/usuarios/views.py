@@ -1,10 +1,4 @@
-"""
-Vistas de la aplicación usuarios.
-
-Incluye vistas para login, logout, activación de cuenta,
-recuperación de contraseña y dashboard principal.
-"""
-
+# Incluye vistas para login, logout, activación de cuenta, recuperación de contraseña y dashboard principal.
 import logging
 from datetime import timedelta
 
@@ -25,12 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def login_view(request):
-    """
-    Vista de inicio de sesión.
-
-    Muestra formulario de login y autentica usuario por email y contraseña.
-    Redirige al dashboard si la autenticación es exitosa.
-    """
+    # Vista de inicio de sesión, Muestra formulario de login y autentica usuario por email y contraseña. Redirige al dashboard si la autenticación es exitosa.
     # Si el usuario ya está autenticado, redirigir al home
     if request.user.is_authenticated:
         return redirect('home')
@@ -59,27 +48,14 @@ def login_view(request):
 
 
 def logout_view(request):
-    """
-    Vista de cierre de sesión.
-
-    Cierra la sesión del usuario y redirige al login.
-    """
+    # Vista de cierre de sesión. Cierra la sesión del usuario y redirige al login.
     logout(request)
     messages.info(request, 'Has cerrado sesión correctamente.')
     return redirect('login')
 
 
 def activate_view(request, token):
-    """
-    Vista de activación de cuenta.
-
-    Valida el token de activación y muestra formulario para
-    establecer la contraseña inicial del usuario.
-
-    Args:
-        request: Objeto HttpRequest.
-        token: Token de activación único.
-    """
+    # Vista de activación de cuenta. Valida el token de activación y muestra formulario para establecer la contraseña inicial del usuario.
     try:
         token_obj = TokenActivacion.objects.get(
             token=token,
@@ -136,12 +112,7 @@ def activate_view(request, token):
 
 
 def password_reset_view(request):
-    """
-    Vista para solicitar recuperación de contraseña.
-
-    Envía un email con un link para restablecer la contraseña
-    si el email existe en el sistema.
-    """
+    # Vista para solicitar recuperación de contraseña. Envía un email con un link para restablecer la contraseña si el email existe en el sistema.
     if request.method == 'POST':
         form = SolicitarRecuperacionForm(request.POST)
         if form.is_valid():
@@ -220,16 +191,7 @@ def password_reset_view(request):
 
 
 def password_reset_confirm_view(request, token):
-    """
-    Vista para confirmar y establecer nueva contraseña.
-
-    Valida el token de recuperación y permite al usuario
-    establecer una nueva contraseña.
-
-    Args:
-        request: Objeto HttpRequest.
-        token: Token de recuperación único.
-    """
+    # Vista para confirmar y establecer nueva contraseña.Valida el token de recuperación y permite al usuario establecer una nueva contraseña.
     try:
         token_obj = TokenActivacion.objects.get(
             token=token,
@@ -279,11 +241,7 @@ def password_reset_confirm_view(request, token):
 
 @login_required
 def home_view(request):
-    """
-    Vista del dashboard principal.
-
-    Requiere autenticación. Muestra información diferente según el rol del usuario.
-    """
+    # Vista del dashboard principal. Requiere autenticación. Muestra información diferente según el rol del usuario.
     usuario = request.user
 
     contexto = {

@@ -1,33 +1,8 @@
-"""
-Manager personalizado para el modelo Usuario.
-
-Permite la creación de usuarios y superusuarios usando email
-como campo de identificación principal en lugar de username.
-"""
-
 from django.contrib.auth.models import BaseUserManager
 
 
 class UsuarioManager(BaseUserManager):
-    """Manager personalizado para el modelo Usuario con email como identificador."""
-
     def create_user(self, email, nombre, apellido, password=None, **extra_fields):
-        """
-        Crear y guardar un usuario con el email, nombre, apellido y contraseña dados.
-
-        Args:
-            email: Dirección de email del usuario.
-            nombre: Nombre del usuario.
-            apellido: Apellido del usuario.
-            password: Contraseña del usuario (opcional para usuarios por invitación).
-            **extra_fields: Campos adicionales.
-
-        Returns:
-            Instancia del usuario creado.
-
-        Raises:
-            ValueError: Si no se proporciona email.
-        """
         if not email:
             raise ValueError('El usuario debe tener una dirección de email.')
 
@@ -49,19 +24,6 @@ class UsuarioManager(BaseUserManager):
         return usuario
 
     def create_superuser(self, email, nombre, apellido, password=None, **extra_fields):
-        """
-        Crear y guardar un superusuario con email, nombre, apellido y contraseña.
-
-        Args:
-            email: Dirección de email del superusuario.
-            nombre: Nombre del superusuario.
-            apellido: Apellido del superusuario.
-            password: Contraseña del superusuario.
-            **extra_fields: Campos adicionales.
-
-        Returns:
-            Instancia del superusuario creado.
-        """
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)

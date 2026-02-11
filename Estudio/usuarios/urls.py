@@ -1,7 +1,4 @@
-"""URLs de la aplicación usuarios."""
-
 from django.urls import path
-
 from . import views
 
 urlpatterns = [
