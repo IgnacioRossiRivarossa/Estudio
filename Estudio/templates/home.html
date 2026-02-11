@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Estudio{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="fw-bold">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </h2>
+            <p class="text-muted">
+                Bienvenido/a, <strong>{{ usuario.get_full_name }}</strong>.
+                <span class="badge bg-info">{{ usuario.rol }}</span>
+            </p>
+        </div>
+    </div>
+
+    {% if usuario.rol == 'Administrador' %}
+    <!-- Panel de Administrador -->
+    <div class="row g-4 mb-4">
+        <div class="col-12 col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="display-4 text-primary mb-2">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h5 class="card-title">Total Usuarios</h5>
+                    <p class="display-6 fw-bold">{{ total_usuarios }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="display-4 text-success mb-2">
+                        <i class="bi bi-person-check"></i>
+                    </div>
+                    <h5 class="card-title">Usuarios Activos</h5>
+                    <p class="display-6 fw-bold text-success">{{ usuarios_activos }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="display-4 text-warning mb-2">
+                        <i class="bi bi-person-exclamation"></i>
+                    </div>
+                    <h5 class="card-title">Pendientes</h5>
+                    <p class="display-6 fw-bold text-warning">{{ usuarios_pendientes }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accesos rápidos para administrador -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-lightning"></i> Accesos Rápidos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <a href="/admin/usuarios/usuario/add/"
+                               class="btn btn-outline-primary w-100 py-3">
+                                <i class="bi bi-person-plus d-block mb-1 fs-4"></i>
+                                Nuevo Usuario
+                            </a>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <a href="/admin/clientes/empresa/add/"
+                               class="btn btn-outline-success w-100 py-3">
+                                <i class="bi bi-building-add d-block mb-1 fs-4"></i>
+                                Nueva Empresa
+                            </a>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <a href="/admin/usuarios/usuario/"
+                               class="btn btn-outline-info w-100 py-3">
+                                <i class="bi bi-people d-block mb-1 fs-4"></i>
+                                Gestionar Usuarios
+                            </a>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <a href="/admin/clientes/empresa/"
+                               class="btn btn-outline-warning w-100 py-3">
+                                <i class="bi bi-buildings d-block mb-1 fs-4"></i>
+                                Gestionar Empresas
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if usuario.rol == 'Colaborador' %}
+    <!-- Panel de Colaborador -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-briefcase"></i> Panel de Colaborador
+                    </h5>
+                    <p class="text-muted">
+                        Bienvenido al panel de colaborador. Aquí encontrarás las herramientas
+                        y la información necesaria para tu trabajo diario.
+                    </p>
+                    <!-- TODO: Agregar funcionalidades específicas para colaboradores -->
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if usuario.rol == 'Cliente' %}
+    <!-- Panel de Cliente -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-person"></i> Mi Panel
+                    </h5>
+                    <p class="text-muted">
+                        Bienvenido a tu panel personal. Desde aquí puedes acceder a
+                        la información de tus empresas y gestionar tus datos.
+                    </p>
+                    <!-- TODO: Agregar funcionalidades específicas para clientes -->
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Empresas Asociadas (visible para todos los roles) -->
+    {% if empresas %}
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-buildings"></i> Mis Empresas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        {% for empresa in empresas %}
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="card border h-100">
+                                <div class="card-body">
+                                    <h6 class="card-title fw-bold">{{ empresa.nombre }}</h6>
+                                    <p class="card-text small text-muted mb-1">
+                                        <i class="bi bi-file-text"></i> {{ empresa.razon_social }}
+                                    </p>
+                                    <p class="card-text small text-muted mb-1">
+                                        <i class="bi bi-upc-scan"></i> CUIT: {{ empresa.cuit }}
+                                    </p>
+                                    <p class="card-text small text-muted mb-0">
+                                        <i class="bi bi-envelope"></i> {{ empresa.email }}
+                                    </p>
+                                </div>
+                                <div class="card-footer bg-white border-top-0">
+                                    <span class="badge {% if empresa.estado == 'activo' %}bg-success{% else %}bg-secondary{% endif %}">
+                                        {{ empresa.get_estado_display }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-buildings display-4 text-muted"></i>
+                    <p class="text-muted mt-2">No tienes empresas asociadas.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

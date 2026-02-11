@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /media/
+Disallow: /static/
+Disallow: /login/
+Disallow: /logout/
+Disallow: /activate/
+Disallow: /password-reset/
+Disallow: /password-reset-confirm/
+
+# Sitemap
+Sitemap: https://tudominio.com/sitemap.xml

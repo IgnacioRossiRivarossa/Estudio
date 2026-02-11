@@ -1,0 +1,235 @@
+/* =============================================================================
+   Estudio - Estilos Personalizados
+   Complementarios a Bootstrap 5
+   ============================================================================= */
+
+/* --- Variables CSS de marca --- */
+:root {
+    --color-primary: #0d6efd;
+    --color-primary-dark: #0b5ed7;
+    --color-secondary: #6c757d;
+    --color-success: #198754;
+    --color-warning: #ffc107;
+    --color-danger: #dc3545;
+    --color-info: #0dcaf0;
+    --color-bg-light: #f8f9fa;
+    --color-text-primary: #212529;
+    --color-text-secondary: #6c757d;
+    --border-radius: 0.5rem;
+    --transition-speed: 0.3s;
+}
+
+/* --- Reset y estilos globales --- */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-bg-light);
+    color: var(--color-text-primary);
+}
+
+main {
+    flex: 1;
+}
+
+/* --- Navbar personalizado --- */
+.navbar {
+    transition: box-shadow var(--transition-speed) ease;
+}
+
+.navbar-brand {
+    font-size: 1.3rem;
+    letter-spacing: 0.5px;
+}
+
+/* --- Cards --- */
+.card {
+    border-radius: var(--border-radius);
+    transition: transform var(--transition-speed) ease,
+                box-shadow var(--transition-speed) ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* --- Formularios --- */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+.form-control {
+    border-radius: var(--border-radius);
+    padding: 0.6rem 0.75rem;
+    transition: border-color var(--transition-speed) ease,
+                box-shadow var(--transition-speed) ease;
+}
+
+/* --- Botones --- */
+.btn {
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    transition: all var(--transition-speed) ease;
+}
+
+.btn-primary {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-success:hover,
+.btn-outline-info:hover,
+.btn-outline-warning:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Alertas --- */
+.alert {
+    border-radius: var(--border-radius);
+    border: none;
+    font-size: 0.9rem;
+}
+
+.alert-dismissible .btn-close {
+    padding: 0.5rem;
+}
+
+/* --- Badges --- */
+.badge {
+    font-weight: 500;
+    padding: 0.4em 0.8em;
+}
+
+/* --- Login y páginas de autenticación --- */
+.min-vh-100 {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+/* --- Footer --- */
+.footer {
+    background-color: var(--color-bg-light);
+}
+
+/* --- Estadísticas del dashboard --- */
+.display-6 {
+    font-weight: 700;
+}
+
+/* --- Input group para contraseñas --- */
+.input-group .btn-outline-secondary {
+    border-color: #dee2e6;
+    color: var(--color-secondary);
+}
+
+.input-group .btn-outline-secondary:hover {
+    background-color: #e9ecef;
+    color: var(--color-text-primary);
+    transform: none;
+    box-shadow: none;
+}
+
+/* --- Dropdown personalizado --- */
+.dropdown-menu {
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.dropdown-item {
+    padding: 0.5rem 1rem;
+    transition: background-color var(--transition-speed) ease;
+}
+
+/* --- Animación de carga --- */
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Scrollbar personalizado --- */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}
+
+/* --- Media queries adicionales --- */
+@media (max-width: 576px) {
+    .card-body {
+        padding: 1rem;
+    }
+
+    .display-6 {
+        font-size: 1.8rem;
+    }
+
+    .navbar-brand {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+
+/* --- Accesibilidad --- */
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* --- Estilos para impresión --- */
+@media print {
+    .navbar,
+    .footer,
+    .btn,
+    .alert {
+        display: none !important;
+    }
+
+    body {
+        background: white;
+        color: black;
+    }
+}
