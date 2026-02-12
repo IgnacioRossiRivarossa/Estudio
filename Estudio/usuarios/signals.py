@@ -55,12 +55,13 @@ def enviar_email_activacion(sender, instance, created, **kwargs):
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[instance.email],
                 html_message=html_message,
-                fail_silently=False,
+                fail_silently=True,  # No interrumpir si falla el envío
             )
 
             logger.info(f'Email de activación enviado a {instance.email}')
 
         except Exception as e:
             logger.error(
-                f'Error al enviar email de activación a {instance.email}: {str(e)}'
+                f'Error al enviar email de activación a {instance.email}: {str(e)}',
+                exc_info=True
             )

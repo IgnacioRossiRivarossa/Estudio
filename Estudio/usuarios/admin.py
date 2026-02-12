@@ -155,7 +155,7 @@ class UsuarioAdmin(BaseUserAdmin):
                     from_email=settings.DEFAULT_FROM_EMAIL,
                     recipient_list=[usuario.email],
                     html_message=html_message,
-                    fail_silently=False,
+                    fail_silently=True,  # No interrumpir si falla el envío
                 )
                 enviados += 1
 
