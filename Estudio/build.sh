@@ -15,4 +15,6 @@ python manage.py collectstatic --no-input
 python manage.py migrate
 
 # Create superuser (only if it doesn't exist)
-python manage.py createsuperuser --username admin --email "ignaciorossi@rivarossa.com" --noinput || true
+# Note: Requiere variables de entorno: DJANGO_SUPERUSER_EMAIL, DJANGO_SUPERUSER_PASSWORD, 
+# DJANGO_SUPERUSER_NOMBRE, DJANGO_SUPERUSER_APELLIDO
+python manage.py createsuperuser --email "${DJANGO_SUPERUSER_EMAIL}" --noinput || true
