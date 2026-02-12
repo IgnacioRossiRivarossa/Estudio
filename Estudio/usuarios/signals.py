@@ -12,11 +12,10 @@ from .models import Usuario, TokenActivacion
 
 logger = logging.getLogger(__name__)
 
-
 @receiver(post_save, sender=Usuario)
 def enviar_email_activacion(sender, instance, created, **kwargs):
-    # Solo se envía si el usuario fue recién creado y está en estado 'pendiente'.
-    # Genera un token de activación y envía el email con el link correspondiente.
+    return  # Deshabilitado temporalmente para evitar timeouts en producción
+    
     if created and instance.estado == 'pendiente' and not instance.is_superuser:
         try:
             # Crear o actualizar token de activación

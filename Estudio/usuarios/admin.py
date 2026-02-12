@@ -9,6 +9,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.html import strip_tags
 from .models import Usuario, TokenActivacion
+from .utils import enviar_email_activacion_usuario
 
 class EmpresaUsuarioInline(admin.TabularInline):
     model = Usuario.empresas.through
@@ -28,7 +29,6 @@ class UsuarioCreationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
-
 
 class UsuarioChangeForm(forms.ModelForm):
 
@@ -111,65 +111,33 @@ class UsuarioAdmin(BaseUserAdmin):
 
     @admin.action(description='Enviar email de activación')
     def enviar_email_activacion(self, request, queryset):
+        """Envía emails de activación de forma segura con manejo de errores."""
         enviados = 0
+        errores = []
+        
         for usuario in queryset:
-            try:
-                # Crear o actualizar token
-                token_obj, _ = TokenActivacion.objects.update_or_create(
-                    usuario=usuario,
-                    defaults={
-                        'token': str(uuid.uuid4()),
-                        'tipo': TokenActivacion.TipoToken.ACTIVACION,
-                        'expira_en': timezone.now() + timedelta(hours=24),
-                    }
-                )
-
-                # Construir URL
-                if settings.DEBUG:
-                    dominio = 'localhost:8000'
-                else:
-                    dominio = (
-                        settings.ALLOWED_HOSTS[0]
-                        if settings.ALLOWED_HOSTS
-                        else 'localhost'
-                    )
-                protocolo = 'https' if not settings.DEBUG else 'http'
-                url_activacion = (
-                    f'{protocolo}://{dominio}/activate/{token_obj.token}/'
-                )
-
-                # Enviar email
-                contexto = {
-                    'usuario': usuario,
-                    'url_activacion': url_activacion,
-                    'expira_en': '24 horas',
-                }
-                html_message = render_to_string(
-                    'email/activacion_cuenta.html', contexto
-                )
-                plain_message = strip_tags(html_message)
-
-                send_mail(
-                    subject='Bienvenido/a - Activa tu cuenta',
-                    message=plain_message,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[usuario.email],
-                    html_message=html_message,
-                    fail_silently=True,  # No interrumpir si falla el envío
-                )
+            success, mensaje = enviar_email_activacion_usuario(usuario)
+            
+            if success:
                 enviados += 1
+            else:
+                errores.append(f'{usuario.email}: {mensaje}')
 
-            except Exception as e:
+        # Mostrar resultados
+        if enviados > 0:
+            self.message_user(
+                request,
+                f'✅ Se enviaron {enviados} email(s) de activación exitosamente.',
+                level='success',
+            )
+        
+        if errores:
+            for error in errores:
                 self.message_user(
                     request,
-                    f'Error al enviar email a {usuario.email}: {str(e)}',
+                    f'❌ {error}',
                     level='error',
                 )
-
-        self.message_user(
-            request,
-            f'Se enviaron {enviados} email(s) de activación exitosamente.',
-        )
 
     @admin.action(description='Activar usuarios seleccionados')
     def activar_usuarios(self, request, queryset):
