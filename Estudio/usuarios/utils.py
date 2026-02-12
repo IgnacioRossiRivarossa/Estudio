@@ -56,11 +56,15 @@ def enviar_email_activacion_usuario(usuario):
         email.content_subtype = 'html'
         email.body = html_message
         
-        # Enviar
-        email.send(fail_silently=False)
+        # Enviar con fail_silently=True para evitar bloqueos por timeout
+        result = email.send(fail_silently=True)
         
-        logger.info(f'Email de activación enviado exitosamente a {usuario.email}')
-        return True, f'Email enviado a {usuario.email}'
+        if result > 0:
+            logger.info(f'✅ Email de activación enviado exitosamente a {usuario.email}')
+            return True, f'Email enviado a {usuario.email}'
+        else:
+            logger.warning(f'⚠️ No se pudo enviar email a {usuario.email}. Verifica configuración SMTP.')
+            return False, 'No se pudo enviar el email. Verifica las credenciales SMTP en las variables de entorno.'
 
     except Exception as e:
         error_msg = str(e)
