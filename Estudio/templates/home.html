@@ -1,18 +1,19 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Dashboard - Estudio{% endblock %}
+{% block title %}Dashboard - Estudio Rivarossa{% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<div class="container-studio py-4">
     <!-- Encabezado -->
     <div class="row mb-4">
         <div class="col-12">
-            <h2 class="fw-bold">
-                <i class="bi bi-speedometer2"></i> Dashboard
+            <h2 class="fw-bold" style="font-family: var(--font-heading); font-size: var(--font-size-4xl); color: var(--text-primary);">
+                <i class="bi bi-speedometer2 text-purple"></i> Dashboard
             </h2>
-            <p class="text-muted">
-                Bienvenido/a, <strong>{{ usuario.get_full_name }}</strong>.
-                <span class="badge bg-info">{{ usuario.rol }}</span>
+            <p style="color: var(--text-secondary); font-size: var(--font-size-lg);">
+                Bienvenido/a, <strong>{{ usuario.get_full_name }}</strong>
+                <span class="badge-studio badge-studio-purple ms-2">{{ usuario.rol }}</span>
             </p>
         </div>
     </div>
@@ -21,36 +22,36 @@
     <!-- Panel de Administrador -->
     <div class="row g-4 mb-4">
         <div class="col-12 col-md-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <div class="display-4 text-primary mb-2">
-                        <i class="bi bi-people"></i>
-                    </div>
-                    <h5 class="card-title">Total Usuarios</h5>
-                    <p class="display-6 fw-bold">{{ total_usuarios }}</p>
+            <div class="card-studio hover-lift text-center">
+                <div style="font-size: 3rem; color: var(--color-purple-primary); margin-bottom: var(--spacing-md);">
+                    <i class="bi bi-people"></i>
                 </div>
+                <h5 class="card-studio-title">Total Usuarios</h5>
+                <p style="font-size: var(--font-size-5xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin: 0;">
+                    {{ total_usuarios }}
+                </p>
             </div>
         </div>
         <div class="col-12 col-md-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <div class="display-4 text-success mb-2">
-                        <i class="bi bi-person-check"></i>
-                    </div>
-                    <h5 class="card-title">Usuarios Activos</h5>
-                    <p class="display-6 fw-bold text-success">{{ usuarios_activos }}</p>
+            <div class="card-studio hover-lift text-center">
+                <div style="font-size: 3rem; color: #198754; margin-bottom: var(--spacing-md);">
+                    <i class="bi bi-person-check"></i>
                 </div>
+                <h5 class="card-studio-title">Usuarios Activos</h5>
+                <p style="font-size: var(--font-size-5xl); font-weight: var(--font-weight-bold); color: #198754; margin: 0;">
+                    {{ usuarios_activos }}
+                </p>
             </div>
         </div>
         <div class="col-12 col-md-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <div class="display-4 text-warning mb-2">
-                        <i class="bi bi-person-exclamation"></i>
-                    </div>
-                    <h5 class="card-title">Pendientes</h5>
-                    <p class="display-6 fw-bold text-warning">{{ usuarios_pendientes }}</p>
+            <div class="card-studio hover-lift text-center">
+                <div style="font-size: 3rem; color: #ffc107; margin-bottom: var(--spacing-md);">
+                    <i class="bi bi-person-exclamation"></i>
                 </div>
+                <h5 class="card-studio-title">Pendientes</h5>
+                <p style="font-size: var(--font-size-5xl); font-weight: var(--font-weight-bold); color: #ffc107; margin: 0;">
+                    {{ usuarios_pendientes }}
+                </p>
             </div>
         </div>
     </div>
@@ -58,38 +59,36 @@
     <!-- Accesos rápidos para administrador -->
     <div class="row g-4 mb-4">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0"><i class="bi bi-lightning"></i> Accesos Rápidos</h5>
+            <div class="card-studio">
+                <div class="card-studio-header">
+                    <h5 style="margin: 0; font-family: var(--font-heading); font-weight: var(--font-weight-semibold);">
+                        <i class="bi bi-lightning text-purple"></i> Accesos Rápidos
+                    </h5>
                 </div>
-                <div class="card-body">
+                <div class="card-studio-body">
                     <div class="row g-3">
                         <div class="col-12 col-md-6 col-lg-3">
-                            <a href="/admin/usuarios/usuario/add/"
-                               class="btn btn-outline-primary w-100 py-3">
-                                <i class="bi bi-person-plus d-block mb-1 fs-4"></i>
-                                Nuevo Usuario
+                            <a href="/admin/usuarios/usuario/add/" class="btn-studio-secondary w-100" style="padding: var(--spacing-lg); height: 100%; flex-direction: column;">
+                                <i class="bi bi-person-plus" style="font-size: 2rem; margin-bottom: var(--spacing-sm);"></i>
+                                <span>Nuevo Usuario</span>
                             </a>
                         </div>
                         <div class="col-12 col-md-6 col-lg-3">
-                            <a href="/admin/clientes/empresa/add/"
-                               class="btn btn-outline-success w-100 py-3">
-                                <i class="bi bi-building-add d-block mb-1 fs-4"></i>
-                                Nueva Empresa
+                            <a href="/admin/clientes/empresa/add/" class="btn-studio-secondary w-100" style="padding: var(--spacing-lg); height: 100%; flex-direction: column;">
+                                <i class="bi bi-building-add" style="font-size: 2rem; margin-bottom: var(--spacing-sm);"></i>
+                                <span>Nueva Empresa</span>
                             </a>
                         </div>
                         <div class="col-12 col-md-6 col-lg-3">
-                            <a href="/admin/usuarios/usuario/"
-                               class="btn btn-outline-info w-100 py-3">
-                                <i class="bi bi-people d-block mb-1 fs-4"></i>
-                                Gestionar Usuarios
+                            <a href="/admin/usuarios/usuario/" class="btn-studio-secondary w-100" style="padding: var(--spacing-lg); height: 100%; flex-direction: column;">
+                                <i class="bi bi-people" style="font-size: 2rem; margin-bottom: var(--spacing-sm);"></i>
+                                <span>Gestionar Usuarios</span>
                             </a>
                         </div>
                         <div class="col-12 col-md-6 col-lg-3">
-                            <a href="/admin/clientes/empresa/"
-                               class="btn btn-outline-warning w-100 py-3">
-                                <i class="bi bi-buildings d-block mb-1 fs-4"></i>
-                                Gestionar Empresas
+                            <a href="/admin/clientes/empresa/" class="btn-studio-secondary w-100" style="padding: var(--spacing-lg); height: 100%; flex-direction: column;">
+                                <i class="bi bi-buildings" style="font-size: 2rem; margin-bottom: var(--spacing-sm);"></i>
+                                <span>Gestionar Empresas</span>
                             </a>
                         </div>
                     </div>
@@ -103,16 +102,40 @@
     <!-- Panel de Colaborador -->
     <div class="row g-4 mb-4">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="bi bi-briefcase"></i> Panel de Colaborador
+            <div class="card-studio">
+                <div class="card-studio-header">
+                    <h5 style="margin: 0;">
+                        <i class="bi bi-briefcase text-purple"></i> Panel de Colaborador
                     </h5>
-                    <p class="text-muted">
+                </div>
+                <div class="card-studio-body">
+                    <p style="color: var(--text-secondary); margin-bottom: var(--spacing-lg);">
                         Bienvenido al panel de colaborador. Aquí encontrarás las herramientas
                         y la información necesaria para tu trabajo diario.
                     </p>
-                    <!-- TODO: Agregar funcionalidades específicas para colaboradores -->
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="card-studio text-center hover-lift">
+                                <i class="bi bi-file-earmark-text" style="font-size: 2rem; color: var(--color-purple-primary);"></i>
+                                <h6 style="margin-top: var(--spacing-sm);">Documentos</h6>
+                                <p style="color: var(--text-tertiary); font-size: var(--font-size-sm);">Gestión de archivos</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card-studio text-center hover-lift">
+                                <i class="bi bi-calendar-event" style="font-size: 2rem; color: var(--color-purple-primary);"></i>
+                                <h6 style="margin-top: var(--spacing-sm);">Calendario</h6>
+                                <p style="color: var(--text-tertiary); font-size: var(--font-size-sm);">Próximos eventos</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card-studio text-center hover-lift">
+                                <i class="bi bi-clipboard-check" style="font-size: 2rem; color: var(--color-purple-primary);"></i>
+                                <h6 style="margin-top: var(--spacing-sm);">Tareas</h6>
+                                <p style="color: var(--text-tertiary); font-size: var(--font-size-sm);">Mis asignaciones</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -123,16 +146,35 @@
     <!-- Panel de Cliente -->
     <div class="row g-4 mb-4">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="bi bi-person"></i> Mi Panel
+            <div class="card-studio">
+                <div class="card-studio-header">
+                    <h5 style="margin: 0;">
+                        <i class="bi bi-person text-purple"></i> Mi Panel
                     </h5>
-                    <p class="text-muted">
+                </div>
+                <div class="card-studio-body">
+                    <p style="color: var(--text-secondary); margin-bottom: var(--spacing-lg);">
                         Bienvenido a tu panel personal. Desde aquí puedes acceder a
                         la información de tus empresas y gestionar tus datos.
                     </p>
-                    <!-- TODO: Agregar funcionalidades específicas para clientes -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="card-studio hover-lift">
+                                <i class="bi bi-folder2-open" style="font-size: 2rem; color: var(--color-purple-primary);"></i>
+                                <h6 style="margin-top: var(--spacing-sm);">Mis Documentos</h6>
+                                <p style="color: var(--text-tertiary); font-size: var(--font-size-sm);">Accede a tu información</p>
+                                <a href="#" class="btn-studio-primary btn-studio-sm" style="margin-top: var(--spacing-sm);">Ver documentos</a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card-studio hover-lift">
+                                <i class="bi bi-envelope-open" style="font-size: 2rem; color: var(--color-purple-primary);"></i>
+                                <h6 style="margin-top: var(--spacing-sm);">Mensajes</h6>
+                                <p style="color: var(--text-tertiary); font-size: var(--font-size-sm);">Comunícate con el estudio</p>
+                                <a href="#" class="btn-studio-primary btn-studio-sm" style="margin-top: var(--spacing-sm);">Ver mensajes</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -143,31 +185,33 @@
     {% if empresas %}
     <div class="row g-4">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">
-                        <i class="bi bi-buildings"></i> Mis Empresas
+            <div class="card-studio">
+                <div class="card-studio-header">
+                    <h5 style="margin: 0;">
+                        <i class="bi bi-buildings text-purple"></i> Mis Empresas
                     </h5>
                 </div>
-                <div class="card-body">
+                <div class="card-studio-body">
                     <div class="row g-3">
                         {% for empresa in empresas %}
                         <div class="col-12 col-md-6 col-lg-4">
-                            <div class="card border h-100">
-                                <div class="card-body">
-                                    <h6 class="card-title fw-bold">{{ empresa.nombre }}</h6>
-                                    <p class="card-text small text-muted mb-1">
+                            <div class="card-studio hover-lift" style="height: 100%;">
+                                <div style="margin-bottom: var(--spacing-md);">
+                                    <h6 style="font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-bottom: var(--spacing-sm);">
+                                        {{ empresa.nombre }}
+                                    </h6>
+                                    <p style="color: var(--text-tertiary); font-size: var(--font-size-sm); margin-bottom: var(--spacing-xs);">
                                         <i class="bi bi-file-text"></i> {{ empresa.razon_social }}
                                     </p>
-                                    <p class="card-text small text-muted mb-1">
+                                    <p style="color: var(--text-tertiary); font-size: var(--font-size-sm); margin-bottom: var(--spacing-xs);">
                                         <i class="bi bi-upc-scan"></i> CUIT: {{ empresa.cuit }}
                                     </p>
-                                    <p class="card-text small text-muted mb-0">
+                                    <p style="color: var(--text-tertiary); font-size: var(--font-size-sm); margin: 0;">
                                         <i class="bi bi-envelope"></i> {{ empresa.email }}
                                     </p>
                                 </div>
-                                <div class="card-footer bg-white border-top-0">
-                                    <span class="badge {% if empresa.estado == 'activo' %}bg-success{% else %}bg-secondary{% endif %}">
+                                <div style="border-top: var(--border-width) solid var(--border-light); padding-top: var(--spacing-sm); margin-top: auto;">
+                                    <span class="badge-studio {% if empresa.estado == 'activo' %}badge-studio-purple{% else %}badge-studio-outline{% endif %}">
                                         {{ empresa.get_estado_display }}
                                     </span>
                                 </div>
@@ -182,11 +226,11 @@
     {% else %}
     <div class="row">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center py-5">
-                    <i class="bi bi-buildings display-4 text-muted"></i>
-                    <p class="text-muted mt-2">No tienes empresas asociadas.</p>
-                </div>
+            <div class="card-studio text-center" style="padding: var(--spacing-4xl);">
+                <i class="bi bi-buildings" style="font-size: 4rem; color: var(--text-tertiary); margin-bottom: var(--spacing-md);"></i>
+                <p style="color: var(--text-tertiary); font-size: var(--font-size-lg); margin: 0;">
+                    No tienes empresas asociadas.
+                </p>
             </div>
         </div>
     </div>

@@ -1,0 +1,246 @@
+/* =============================================================================
+   ESTUDIO RIVAROSSA Y ASOCIADOS
+   Sistema de Variables CSS - Design System
+   Paleta de colores corporativa y sistema de temas (Light/Dark Mode)
+   ============================================================================= */
+
+:root {
+    /* =========================================================================
+       PALETA DE COLORES CORPORATIVA
+       ========================================================================= */
+    
+    /* Colores principales del estudio */
+    --color-purple-primary: #8C4F9F;        /* Púrpura vibrante - Acentos y acciones */
+    --color-blue-dark: #233142;             /* Azul grisáceo oscuro - Tipografía y sobriedad */
+    --color-gray-light: #D9D9D9;            /* Gris claro - Separadores y fondos sutiles */
+    --color-white: #FFFFFF;                 /* Blanco - Base de limpieza visual */
+    
+    /* Variaciones de púrpura */
+    --color-purple-hover: #9c5fb0;
+    --color-purple-active: #7a3f8a;
+    --color-purple-light: #a67ab3;
+    --color-purple-lighter: #d4c0dc;
+    --color-purple-alpha-10: rgba(140, 79, 159, 0.1);
+    --color-purple-alpha-20: rgba(140, 79, 159, 0.2);
+    --color-purple-alpha-30: rgba(140, 79, 159, 0.3);
+    
+    /* Variaciones de azul oscuro */
+    --color-blue-darker: #1a2532;
+    --color-blue-lighter: #2d3e52;
+    --color-blue-alpha-90: rgba(35, 49, 66, 0.9);
+    --color-blue-alpha-80: rgba(35, 49, 66, 0.8);
+    --color-blue-alpha-10: rgba(35, 49, 66, 0.1);
+    
+    /* Variaciones de gris */
+    --color-gray-darker: #b8b8b8;
+    --color-gray-lighter: #e8e8e8;
+    --color-gray-lightest: #f5f5f5;
+    --color-gray-medium: #888888;
+    
+    /* =========================================================================
+       TEMA LIGHT (Por defecto)
+       ========================================================================= */
+    
+    /* Fondos */
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #f5f5f5;
+    --bg-tertiary: #e8e8e8;
+    --bg-accent: #8C4F9F;
+    --bg-overlay: rgba(255, 255, 255, 0.95);
+    
+    /* Textos */
+    --text-primary: #233142;
+    --text-secondary: #4a5568;
+    --text-tertiary: #888888;
+    --text-inverse: #FFFFFF;
+    --text-accent: #8C4F9F;
+    
+    /* Bordes */
+    --border-color: #D9D9D9;
+    --border-light: #e8e8e8;
+    --border-focus: #8C4F9F;
+    
+    /* Sombras */
+    --shadow-sm: 0 1px 3px rgba(35, 49, 66, 0.08);
+    --shadow-md: 0 4px 12px rgba(35, 49, 66, 0.12);
+    --shadow-lg: 0 8px 24px rgba(35, 49, 66, 0.15);
+    --shadow-xl: 0 16px 48px rgba(35, 49, 66, 0.18);
+    --shadow-purple: 0 4px 16px rgba(140, 79, 159, 0.25);
+    
+    /* =========================================================================
+       TIPOGRAFÍA
+       ========================================================================= */
+    
+    /* Familias tipográficas */
+    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-heading: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'Fira Code', 'Courier New', monospace;
+    
+    /* Tamaños de fuente */
+    --font-size-xs: 0.75rem;      /* 12px */
+    --font-size-sm: 0.875rem;     /* 14px */
+    --font-size-base: 1rem;       /* 16px */
+    --font-size-lg: 1.125rem;     /* 18px */
+    --font-size-xl: 1.25rem;      /* 20px */
+    --font-size-2xl: 1.5rem;      /* 24px */
+    --font-size-3xl: 1.875rem;    /* 30px */
+    --font-size-4xl: 2.25rem;     /* 36px */
+    --font-size-5xl: 3rem;        /* 48px */
+    
+    /* Pesos de fuente */
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+    
+    /* Altura de línea */
+    --line-height-tight: 1.25;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+    --line-height-loose: 2;
+    
+    /* =========================================================================
+       ESPACIADO
+       ========================================================================= */
+    
+    --spacing-xs: 0.25rem;    /* 4px */
+    --spacing-sm: 0.5rem;     /* 8px */
+    --spacing-md: 1rem;       /* 16px */
+    --spacing-lg: 1.5rem;     /* 24px */
+    --spacing-xl: 2rem;       /* 32px */
+    --spacing-2xl: 3rem;      /* 48px */
+    --spacing-3xl: 4rem;      /* 64px */
+    --spacing-4xl: 6rem;      /* 96px */
+    
+    /* =========================================================================
+       BORDES Y RADIOS
+       ========================================================================= */
+    
+    --radius-none: 0;
+    --radius-sm: 0.25rem;     /* 4px */
+    --radius-md: 0.5rem;      /* 8px */
+    --radius-lg: 0.75rem;     /* 12px */
+    --radius-xl: 1rem;        /* 16px */
+    --radius-2xl: 1.5rem;     /* 24px */
+    --radius-full: 9999px;
+    
+    --border-width: 1px;
+    --border-width-thick: 2px;
+    
+    /* =========================================================================
+       TRANSICIONES Y ANIMACIONES
+       ========================================================================= */
+    
+    --transition-fast: 150ms ease;
+    --transition-base: 250ms ease;
+    --transition-slow: 350ms ease;
+    --transition-all: all 250ms ease;
+    
+    --easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+    --easing-decelerate: cubic-bezier(0, 0, 0.2, 1);
+    --easing-accelerate: cubic-bezier(0.4, 0, 1, 1);
+    
+    /* =========================================================================
+       Z-INDEX
+       ========================================================================= */
+    
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+    
+    /* =========================================================================
+       BREAKPOINTS (para uso en JavaScript)
+       ========================================================================= */
+    
+    --breakpoint-sm: 576px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 992px;
+    --breakpoint-xl: 1200px;
+    --breakpoint-xxl: 1400px;
+}
+
+/* =============================================================================
+   DARK MODE - Tema Oscuro Elegante
+   ============================================================================= */
+
+[data-theme="dark"] {
+    /* Fondos en modo oscuro */
+    --bg-primary: #1a1d24;
+    --bg-secondary: #232833;
+    --bg-tertiary: #2d3340;
+    --bg-accent: #8C4F9F;
+    --bg-overlay: rgba(26, 29, 36, 0.95);
+    
+    /* Textos en modo oscuro */
+    --text-primary: #e8eaed;
+    --text-secondary: #b8bcc4;
+    --text-tertiary: #888c94;
+    --text-inverse: #1a1d24;
+    --text-accent: #a67ab3;
+    
+    /* Bordes en modo oscuro */
+    --border-color: #3d424d;
+    --border-light: #2d3340;
+    --border-focus: #8C4F9F;
+    
+    /* Sombras en modo oscuro */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
+    --shadow-purple: 0 4px 16px rgba(140, 79, 159, 0.35);
+}
+
+/* =============================================================================
+   CLASES DE UTILIDAD PARA TEMAS
+   ============================================================================= */
+
+.theme-transition {
+    transition: background-color var(--transition-base),
+                color var(--transition-base),
+                border-color var(--transition-base);
+}
+
+/* Aplicar transición a todos los elementos principales */
+* {
+    transition: background-color var(--transition-base),
+                color var(--transition-base),
+                border-color var(--transition-base);
+}
+
+/* =============================================================================
+   PREFERENCIA DE SISTEMA (PREFERS-COLOR-SCHEME)
+   ============================================================================= */
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        /* Aplicar tema oscuro si el usuario tiene preferencia del sistema */
+        --bg-primary: #1a1d24;
+        --bg-secondary: #232833;
+        --bg-tertiary: #2d3340;
+        --bg-accent: #8C4F9F;
+        --bg-overlay: rgba(26, 29, 36, 0.95);
+        
+        --text-primary: #e8eaed;
+        --text-secondary: #b8bcc4;
+        --text-tertiary: #888c94;
+        --text-inverse: #1a1d24;
+        --text-accent: #a67ab3;
+        
+        --border-color: #3d424d;
+        --border-light: #2d3340;
+        --border-focus: #8C4F9F;
+        
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+        --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
+        --shadow-purple: 0 4px 16px rgba(140, 79, 159, 0.35);
+    }
+}
