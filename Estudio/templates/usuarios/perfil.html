@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Mi Perfil - Estudio Rivarossa{% endblock %}
+
+{% block meta_description %}Perfil de usuario - Estudio Rivarossa y Asociados{% endblock %}
+
+{% block content %}
+<div class="container-studio py-4">
+
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="fw-bold" style="font-family: var(--font-heading); font-size: var(--font-size-4xl); color: var(--text-primary);">
+                <i class="bi bi-person-circle text-purple"></i> Mi Perfil
+            </h2>
+            <p style="color: var(--text-secondary); font-size: var(--font-size-lg);">
+                Información de tu cuenta
+            </p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Datos personales -->
+        <div class="col-12 col-lg-6">
+            <div class="card-studio h-100">
+                <div class="card-studio-header">
+                    <h5 style="margin: 0; font-family: var(--font-heading); font-weight: var(--font-weight-semibold);">
+                        <i class="bi bi-person text-purple"></i> Datos Personales
+                    </h5>
+                </div>
+                <div class="card-studio-body">
+                    <dl class="row mb-0" style="row-gap: var(--spacing-md);">
+
+                        <dt class="col-sm-4" style="color: var(--text-secondary); font-weight: var(--font-weight-medium);">
+                            Nombre completo
+                        </dt>
+                        <dd class="col-sm-8" style="color: var(--text-primary); font-weight: var(--font-weight-semibold); margin-bottom: 0;">
+                            {{ usuario.get_full_name }}
+                        </dd>
+
+                        <dt class="col-sm-4" style="color: var(--text-secondary); font-weight: var(--font-weight-medium);">
+                            Correo electrónico
+                        </dt>
+                        <dd class="col-sm-8" style="margin-bottom: 0;">
+                            <a href="mailto:{{ usuario.email }}" style="color: var(--color-purple-primary); text-decoration: none;">
+                                {{ usuario.email }}
+                            </a>
+                        </dd>
+
+                        <dt class="col-sm-4" style="color: var(--text-secondary); font-weight: var(--font-weight-medium);">
+                            Rol
+                        </dt>
+                        <dd class="col-sm-8" style="margin-bottom: 0;">
+                            <span class="badge-studio badge-studio-purple">{{ usuario.rol }}</span>
+                        </dd>
+
+                        <dt class="col-sm-4" style="color: var(--text-secondary); font-weight: var(--font-weight-medium);">
+                            Estado
+                        </dt>
+                        <dd class="col-sm-8" style="margin-bottom: 0;">
+                            {% if usuario.estado == 'verificado' %}
+                                <span class="badge-studio" style="background-color: rgba(25, 135, 84, 0.12); color: #198754;">
+                                    <i class="bi bi-patch-check-fill"></i> Verificado
+                                </span>
+                            {% else %}
+                                <span class="badge-studio" style="background-color: rgba(255, 193, 7, 0.15); color: #856404;">
+                                    <i class="bi bi-clock"></i> Pendiente
+                                </span>
+                            {% endif %}
+                        </dd>
+
+                        <dt class="col-sm-4" style="color: var(--text-secondary); font-weight: var(--font-weight-medium);">
+                            Miembro desde
+                        </dt>
+                        <dd class="col-sm-8" style="color: var(--text-primary); margin-bottom: 0;">
+                            {{ usuario.date_joined|date:"d \d\e F \d\e Y" }}
+                        </dd>
+
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empresas asociadas -->
+        <div class="col-12 col-lg-6">
+            <div class="card-studio h-100">
+                <div class="card-studio-header">
+                    <h5 style="margin: 0; font-family: var(--font-heading); font-weight: var(--font-weight-semibold);">
+                        <i class="bi bi-building text-purple"></i> Empresas Asociadas
+                    </h5>
+                </div>
+                <div class="card-studio-body">
+                    {% if empresas %}
+                        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--spacing-md);">
+                            {% for empresa in empresas %}
+                            <li style="
+                                padding: var(--spacing-md) var(--spacing-lg);
+                                border: var(--border-width) solid var(--border-color);
+                                border-radius: var(--radius-md);
+                                background-color: var(--bg-secondary);
+                            ">
+                                <div style="font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-bottom: var(--spacing-xs);">
+                                    <i class="bi bi-building-fill text-purple me-2"></i>{{ empresa.nombre }}
+                                </div>
+                                <div style="font-size: var(--font-size-sm); color: var(--text-secondary);">
+                                    <span class="me-3"><i class="bi bi-card-text me-1"></i>CUIT: {{ empresa.cuit }}</span>
+                                </div>
+                                {% if empresa.email %}
+                                <div style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-top: var(--spacing-xs);">
+                                    <i class="bi bi-envelope me-1"></i>
+                                    <a href="mailto:{{ empresa.email }}" style="color: var(--color-purple-primary); text-decoration: none;">
+                                        {{ empresa.email }}
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div style="text-align: center; padding: var(--spacing-xl) 0; color: var(--text-secondary);">
+                            <div style="font-size: 3rem; margin-bottom: var(--spacing-md); opacity: 0.4;">
+                                <i class="bi bi-building-x"></i>
+                            </div>
+                            <p style="margin: 0;">No tenés empresas asociadas a tu cuenta.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

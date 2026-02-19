@@ -240,6 +240,19 @@ def password_reset_confirm_view(request, token):
 
 
 @login_required
+def perfil_view(request):
+    """Vista del perfil del usuario autenticado. Solo lectura."""
+    usuario = request.user
+    empresas = usuario.empresas.filter(estado='activo').order_by('nombre')
+
+    contexto = {
+        'usuario': usuario,
+        'empresas': empresas,
+    }
+    return render(request, 'usuarios/perfil.html', contexto)
+
+
+@login_required
 def home_view(request):
     # Vista del dashboard principal. Requiere autenticación. Muestra información diferente según el rol del usuario.
     usuario = request.user

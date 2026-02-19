@@ -194,42 +194,37 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    CSRF_COOKIE_SAMESITE = 'Lax'
+
+    # Orígenes de confianza para CSRF (requerido en Django 4.x+ con HTTPS)
+    CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='', cast=Csv())
 
     # HSTS (HTTP Strict Transport Security)
     SECURE_HSTS_SECONDS = 31536000  # 1 año
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
 
-    # Protección XSS y contenido
-    SECURE_BROWSER_XSS_FILTER = True
+    # Protección de contenido (SECURE_BROWSER_XSS_FILTER eliminado en Django 4.0)
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
 
-# =============================================================================
-# CONFIGURACIÓN PARA SEO
-# =============================================================================
-# TODO: Configurar CDN para archivos estáticos cuando se requiera
-# CDN_URL = config('CDN_URL', default='')
-# if CDN_URL:
-#     STATIC_URL = f'{CDN_URL}/static/'
-#     MEDIA_URL = f'{CDN_URL}/media/'
-
-# =============================================================================
-# CAMPO POR DEFECTO PARA CLAVES PRIMARIAS
-# =============================================================================
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-import os
-import dj_database_url
+import logging as _logging
+_render_logger = _logging.getLogger(__name__)
 
 if 'RENDER' in os.environ:
-    print("🚀 USANDO CONFIGURACIÓN DE RENDER.COM")
-    
+    _render_logger.info('Usando configuración de Render.com')
+
     # Desactivar DEBUG en producción
     DEBUG = False
-    
+
     # Configurar hosts permitidos desde variable de entorno
-    ALLOWED_HOSTS = [os.environ.get('RENDER_EXTERNAL_HOSTNAME')]
+    _render_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+    if _render_hostname:
+        ALLOWED_HOSTS = [_render_hostname]
     
     # Configurar base de datos PostgreSQL desde DATABASE_URL
     DATABASES = {
