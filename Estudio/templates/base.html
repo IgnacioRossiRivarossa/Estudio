@@ -44,9 +44,26 @@
           rel="stylesheet">
 
     <!-- CSS Corporativo - Sistema de Diseño -->
-    <link rel="stylesheet" href="{% static 'css/variables.css' %}">
-    <link rel="stylesheet" href="{% static 'css/components.css' %}">
-    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <link rel="stylesheet" href="{% static 'css/variables.css' %}?v=2.0">
+    <link rel="stylesheet" href="{% static 'css/components.css' %}?v=2.0">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}?v=2.0">
+
+    <!-- Prevención de FOUC: aplicar tema antes del primer render -->
+    <script>
+        (function() {
+            var theme = localStorage.getItem('estudio-theme');
+            if (!theme) {
+                theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+                    ? 'dark' : 'light';
+            }
+            document.documentElement.setAttribute('data-theme', theme);
+            // Actualizar meta theme-color según el tema
+            var meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) {
+                meta.setAttribute('content', theme === 'dark' ? '#1a1d24' : '#8C4F9F');
+            }
+        })();
+    </script>
 
     {% block extra_css %}{% endblock %}
 </head>
@@ -239,7 +256,7 @@
             crossorigin="anonymous"></script>
 
     <!-- JavaScript Principal -->
-    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/main.js' %}?v=2.0"></script>
 
     {% block extra_js %}{% endblock %}
 </body>

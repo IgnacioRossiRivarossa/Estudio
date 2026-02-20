@@ -280,21 +280,21 @@
 }
 
 .alert-studio-success {
-    background-color: rgba(25, 135, 84, 0.1);
-    border-color: #198754;
-    color: #146c43;
+    background-color: var(--color-success-bg);
+    border-color: var(--color-success-border);
+    color: var(--color-success-text);
 }
 
 .alert-studio-warning {
-    background-color: rgba(255, 193, 7, 0.1);
-    border-color: #ffc107;
-    color: #997404;
+    background-color: var(--color-warning-bg);
+    border-color: var(--color-warning-border);
+    color: var(--color-warning-text);
 }
 
 .alert-studio-error {
-    background-color: rgba(220, 53, 69, 0.1);
-    border-color: #dc3545;
-    color: #b02a37;
+    background-color: var(--color-danger-bg);
+    border-color: var(--color-danger-border);
+    color: var(--color-danger-text);
 }
 
 /* --- Tooltips --- */

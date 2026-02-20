@@ -46,6 +46,12 @@ const ThemeManager = (() => {
         document.documentElement.setAttribute(THEME_ATTRIBUTE, theme);
         localStorage.setItem(THEME_KEY, theme);
         
+        // Actualizar meta theme-color para la barra del navegador móvil
+        const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+        if (metaThemeColor) {
+            metaThemeColor.setAttribute('content', theme === 'dark' ? '#1a1d24' : '#8C4F9F');
+        }
+        
         // Actualizar ícono del toggle
         updateThemeIcon(theme);
     };
@@ -74,12 +80,6 @@ const ThemeManager = (() => {
         const currentTheme = getCurrentTheme();
         const newTheme = currentTheme === 'light' ? 'dark' : 'light';
         applyTheme(newTheme);
-        
-        // Animación sutil al cambiar tema
-        document.body.style.transition = 'none';
-        setTimeout(() => {
-            document.body.style.transition = '';
-        }, 100);
     };
     
     /**
@@ -495,6 +495,26 @@ document.addEventListener('DOMContentLoaded', () => {
     FormManager.init();
     NavbarManager.init();
     
+    // Prevención de envío múltiple de formularios
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', () => {
+            const submitBtn = form.querySelector('[type="submit"]');
+            if (submitBtn && !submitBtn.disabled) {
+                submitBtn.setAttribute('data-original-text', submitBtn.innerHTML);
+                submitBtn.disabled = true;
+                submitBtn.innerHTML =
+                    '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Procesando...';
+
+                // Re-habilitar después de 10 segundos (por si hay un error)
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = submitBtn.getAttribute('data-original-text') || 'Enviar';
+                }, 10000);
+            }
+        });
+    });
+    
     console.log('%c🏢 Estudio Rivarossa y Asociados', 'color: #8C4F9F; font-size: 16px; font-weight: bold;');
     console.log('%cSistema inicializado correctamente', 'color: #233142; font-size: 12px;');
 });
@@ -503,41 +523,3 @@ document.addEventListener('DOMContentLoaded', () => {
 window.EstudioUtils = Utils;
 window.EstudioTheme = ThemeManager;
 window.EstudioAlerts = AlertManager;
-
-        number: /[0-9]/.test(password),
-    };
-}
-
-// =============================================================================
-// UTILIDADES
-// =============================================================================
-
-/**
- * Previene envío múltiple de formularios.
- * Deshabilita el botón de submit después del primer clic.
- */
-document.addEventListener('DOMContentLoaded', function () {
-    const forms = document.querySelectorAll('form');
-    forms.forEach(function (form) {
-        form.addEventListener('submit', function () {
-            const submitBtn = form.querySelector('[type="submit"]');
-            if (submitBtn && !submitBtn.disabled) {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML =
-                    '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Procesando...';
-
-                // Re-habilitar después de 10 segundos (por si hay un error)
-                setTimeout(function () {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = submitBtn.getAttribute('data-original-text') || 'Enviar';
-                }, 10000);
-            }
-        });
-    });
-
-    // Guardar texto original de botones
-    const submitButtons = document.querySelectorAll('[type="submit"]');
-    submitButtons.forEach(function (btn) {
-        btn.setAttribute('data-original-text', btn.innerHTML);
-    });
-});

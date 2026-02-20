@@ -67,6 +67,19 @@
     --shadow-xl: 0 16px 48px rgba(35, 49, 66, 0.18);
     --shadow-purple: 0 4px 16px rgba(140, 79, 159, 0.25);
     
+    /* Colores de estado (alertas, badges) */
+    --color-success-bg: rgba(25, 135, 84, 0.1);
+    --color-success-text: #146c43;
+    --color-success-border: #198754;
+    
+    --color-warning-bg: rgba(255, 193, 7, 0.1);
+    --color-warning-text: #997404;
+    --color-warning-border: #ffc107;
+    
+    --color-danger-bg: rgba(220, 53, 69, 0.1);
+    --color-danger-text: #b02a37;
+    --color-danger-border: #dc3545;
+    
     /* =========================================================================
        TIPOGRAFÍA
        ========================================================================= */
@@ -195,6 +208,19 @@
     --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
     --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
     --shadow-purple: 0 4px 16px rgba(140, 79, 159, 0.35);
+    
+    /* Colores de estado en modo oscuro (alertas, badges) */
+    --color-success-bg: rgba(25, 135, 84, 0.15);
+    --color-success-text: #75b798;
+    --color-success-border: #198754;
+    
+    --color-warning-bg: rgba(255, 193, 7, 0.15);
+    --color-warning-text: #ffda6a;
+    --color-warning-border: #ffc107;
+    
+    --color-danger-bg: rgba(220, 53, 69, 0.15);
+    --color-danger-text: #ea868f;
+    --color-danger-border: #dc3545;
 }
 
 /* =============================================================================
@@ -207,11 +233,30 @@
                 border-color var(--transition-base);
 }
 
-/* Aplicar transición a todos los elementos principales */
-* {
+/**
+ * Transiciones suaves durante el cambio de tema.
+ * Se aplica solo a elementos que usan variables de tema,
+ * evitando penalizar el rendimiento con el selector universal *.
+ */
+body,
+.navbar-studio,
+.card, .card-studio,
+.dropdown-menu,
+.modal-content,
+.form-control,
+.form-select,
+.alert,
+.footer-studio,
+.theme-toggle,
+.btn-studio-ghost,
+.btn-studio-secondary,
+.input-studio,
+.nav-studio-item,
+.badge-studio {
     transition: background-color var(--transition-base),
                 color var(--transition-base),
-                border-color var(--transition-base);
+                border-color var(--transition-base),
+                box-shadow var(--transition-base);
 }
 
 /* =============================================================================
@@ -242,5 +287,17 @@
         --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
         --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
         --shadow-purple: 0 4px 16px rgba(140, 79, 159, 0.35);
+        
+        --color-success-bg: rgba(25, 135, 84, 0.15);
+        --color-success-text: #75b798;
+        --color-success-border: #198754;
+        
+        --color-warning-bg: rgba(255, 193, 7, 0.15);
+        --color-warning-text: #ffda6a;
+        --color-warning-border: #ffc107;
+        
+        --color-danger-bg: rgba(220, 53, 69, 0.15);
+        --color-danger-text: #ea868f;
+        --color-danger-border: #dc3545;
     }
 }
