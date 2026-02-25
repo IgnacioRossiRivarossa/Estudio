@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import RedirectView
 
-from .views import home_view, landing_view
+from .views import home_view
 
 admin.site.site_header = 'Estudio - Administración'
 admin.site.site_title = 'Estudio Admin'
@@ -13,7 +13,7 @@ admin.site.index_title = 'Panel de Administración'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('usuarios.urls')),
-    path('', landing_view, name='home'),
+    path('', RedirectView.as_view(url='/login/', permanent=False), name='home'),
     path('dashboard/', home_view, name='dashboard'),
     path('cotizaciones/', include('cotizaciones.urls')),
     path('robots.txt', RedirectView.as_view(url='/static/robots.txt', permanent=True)),

@@ -141,17 +141,10 @@
     <!-- Navbar para usuarios no autenticados -->
     <nav class="navbar-studio">
         <div class="navbar-studio-container">
-            <a class="navbar-studio-brand" href="{% url 'home' %}">
+            <a class="navbar-studio-brand" href="{% url 'login' %}">
                 <img src="{% static 'img/logo.png' %}" alt="Estudio Rivarossa Logo" class="navbar-studio-logo" onerror="this.style.display='none'">
                 <span>Estudio Rivarossa</span>
             </a>
-
-            <nav class="navbar-studio-menu d-none d-lg-flex">
-                <a href="{% url 'home' %}" class="nav-studio-item">Inicio</a>
-                <a href="#servicios" class="nav-studio-item">Servicios</a>
-                <a href="#nosotros" class="nav-studio-item">Nosotros</a>
-                <a href="#contacto" class="nav-studio-item">Contacto</a>
-            </nav>
 
             <div class="navbar-studio-actions">
                 <button type="button" class="theme-toggle" aria-label="Cambiar tema">
@@ -215,10 +208,9 @@
                 <div>
                     <h3 class="footer-studio-section-title">Enlaces Rápidos</h3>
                     <ul class="footer-studio-links">
-                        <li><a href="{% url 'home' %}" class="footer-studio-link">Inicio</a></li>
-                        <li><a href="#servicios" class="footer-studio-link">Servicios</a></li>
-                        <li><a href="#nosotros" class="footer-studio-link">Nosotros</a></li>
-                        <li><a href="#contacto" class="footer-studio-link">Contacto</a></li>
+                        <li><a href="{% url 'dashboard' %}" class="footer-studio-link">Dashboard</a></li>
+                        <li><a href="{% url 'perfil' %}" class="footer-studio-link">Mi Perfil</a></li>
+                        <li><a href="{% url 'login' %}" class="footer-studio-link">Ingresar</a></li>
                     </ul>
                 </div>
 

@@ -7,13 +7,6 @@ from django.shortcuts import render
 from usuarios.models import Usuario
 
 
-def landing_view(request):
-    """Landing page pública para usuarios no autenticados."""
-    if request.user.is_authenticated:
-        return home_view(request)
-    return render(request, 'landing.html')
-
-
 @login_required
 def home_view(request):
     """Dashboard principal para usuarios autenticados."""

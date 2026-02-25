@@ -145,7 +145,6 @@ Estudio/
 ├── templates/
 │   ├── base.html                # Layout base (navbar, footer)
 │   ├── home.html                # Dashboard principal
-│   ├── landing.html             # Página pública
 │   ├── 404.html
 │   ├── 500.html
 │   ├── usuarios/
