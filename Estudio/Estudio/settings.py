@@ -19,12 +19,13 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'django_cleanup.apps.CleanupConfig',  # Debe ir último según documentación
+    'django_cleanup.apps.CleanupConfig',  
 ]
 
 LOCAL_APPS = [
     'usuarios.apps.UsuariosConfig',
     'clientes.apps.ClientesConfig',
+    'cotizaciones.apps.CotizacionesConfig',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
@@ -40,7 +41,6 @@ MIDDLEWARE = [
     'django.middleware.locale.LocaleMiddleware',
 ]
 
-# Whitenoise solo en producción
 if not DEBUG:
     MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
@@ -109,7 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/login/'
 
 LANGUAGE_CODE = 'es'
@@ -118,7 +118,6 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# Formato de fecha y hora en español
 DATE_FORMAT = 'd/m/Y'
 DATETIME_FORMAT = 'd/m/Y H:i:s'
 SHORT_DATE_FORMAT = 'd/m/Y'

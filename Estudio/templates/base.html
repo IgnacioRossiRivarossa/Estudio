@@ -44,9 +44,11 @@
           rel="stylesheet">
 
     <!-- CSS Corporativo - Sistema de Diseño -->
-    <link rel="stylesheet" href="{% static 'css/variables.css' %}?v=2.0">
-    <link rel="stylesheet" href="{% static 'css/components.css' %}?v=2.0">
-    <link rel="stylesheet" href="{% static 'css/custom.css' %}?v=2.0">
+    <link rel="stylesheet" href="{% static 'css/variables.css' %}?v=2.1">
+    <link rel="stylesheet" href="{% static 'css/components.css' %}?v=2.1">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}?v=2.1">
+    <link rel="stylesheet" href="{% static 'css/pages.css' %}?v=2.1">
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}?v=2.1">
 
     <!-- Prevención de FOUC: aplicar tema antes del primer render -->
     <script>
@@ -76,16 +78,21 @@
     <nav class="navbar-studio">
         <div class="navbar-studio-container">
             <!-- Brand -->
-            <a class="navbar-studio-brand" href="{% url 'home' %}">
+            <a class="navbar-studio-brand" href="{% url 'dashboard' %}">
                 <img src="{% static 'img/logo.png' %}" alt="Estudio Rivarossa Logo" class="navbar-studio-logo" onerror="this.style.display='none'">
                 <span>Estudio Rivarossa</span>
             </a>
 
             <!-- Menu -->
             <nav class="navbar-studio-menu d-none d-lg-flex">
-                <a href="{% url 'home' %}" class="nav-studio-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                <a href="{% url 'dashboard' %}" class="nav-studio-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                     <i class="bi bi-speedometer2"></i> Dashboard
                 </a>
+                {% if user.rol == 'Administrador' or user.rol == 'Colaborador' %}
+                <a href="{% url 'cotizaciones:dashboard_economico' %}" class="nav-studio-item {% if request.resolver_match.app_name == 'cotizaciones' %}active{% endif %}">
+                    <i class="bi bi-graph-up-arrow"></i> Cotizaciones
+                </a>
+                {% endif %}
                 {% if user.rol == 'Administrador' %}
                 <a href="/admin/" class="nav-studio-item">
                     <i class="bi bi-gear"></i> Administración
@@ -187,11 +194,11 @@
                 <!-- Acerca de -->
                 <div>
                     <h3 class="footer-studio-section-title">Estudio Rivarossa y Asociados</h3>
-                    <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: var(--spacing-md);">
+                    <p class="footer-description">
                         Excelencia profesional en servicios jurídicos y contables. 
                         Más de {{ años_experiencia|default:"20" }} años de trayectoria.
                     </p>
-                    <div style="display: flex; gap: var(--spacing-md);">
+                    <div class="footer-social">
                         <a href="#" class="btn-studio-icon btn-studio-secondary" aria-label="LinkedIn">
                             <i class="bi bi-linkedin"></i>
                         </a>
@@ -230,13 +237,13 @@
                 <div>
                     <h3 class="footer-studio-section-title">Contacto</h3>
                     <ul class="footer-studio-links">
-                        <li style="color: rgba(255, 255, 255, 0.8); padding: var(--spacing-xs) 0;">
+                        <li class="footer-contact-item">
                             <i class="bi bi-geo-alt me-2"></i> Buenos Aires, Argentina
                         </li>
-                        <li style="color: rgba(255, 255, 255, 0.8); padding: var(--spacing-xs) 0;">
+                        <li class="footer-contact-item">
                             <i class="bi bi-envelope me-2"></i> info@estudiorivarossa.com
                         </li>
-                        <li style="color: rgba(255, 255, 255, 0.8); padding: var(--spacing-xs) 0;">
+                        <li class="footer-contact-item">
                             <i class="bi bi-telephone me-2"></i> +54 11 xxxx-xxxx
                         </li>
                     </ul>
@@ -256,7 +263,7 @@
             crossorigin="anonymous"></script>
 
     <!-- JavaScript Principal -->
-    <script src="{% static 'js/main.js' %}?v=2.0"></script>
+    <script src="{% static 'js/main.js' %}?v=2.1"></script>
 
     {% block extra_js %}{% endblock %}
 </body>

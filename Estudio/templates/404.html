@@ -4,30 +4,21 @@
 {% block title %}Página No Encontrada - Estudio Rivarossa{% endblock %}
 
 {% block content %}
-<div style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: var(--spacing-2xl);">
-    <div style="text-align: center; max-width: 600px;">
-        <!-- Icono animado -->
-        <div style="margin-bottom: var(--spacing-2xl);">
-            <i class="bi bi-compass" style="font-size: 8rem; color: var(--color-purple-primary); opacity: 0.8;"></i>
+<div class="error-page">
+    <div class="error-content">
+        <div class="error-icon error-icon--purple">
+            <i class="bi bi-compass"></i>
         </div>
 
-        <!-- Código de error -->
-        <h1 style="font-family: var(--font-heading); font-size: var(--font-size-5xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin-bottom: var(--spacing-md);">
-            404
-        </h1>
+        <h1 class="error-code">404</h1>
+        <h2 class="error-title">Página No Encontrada</h2>
 
-        <!-- Mensaje -->
-        <h2 style="font-family: var(--font-heading); font-size: var(--font-size-2xl); font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-bottom: var(--spacing-lg);">
-            Página No Encontrada
-        </h2>
-
-        <p style="color: var(--text-secondary); font-size: var(--font-size-lg); line-height: var(--line-height-relaxed); margin-bottom: var(--spacing-2xl);">
-            Lo sentimos, la página que estás buscando no existe o ha sido movida. 
+        <p class="error-description">
+            Lo sentimos, la página que estás buscando no existe o ha sido movida.
             Verifica la URL o regresa al inicio.
         </p>
 
-        <!-- Botones de acción -->
-        <div style="display: flex; gap: var(--spacing-md); justify-content: center; flex-wrap: wrap;">
+        <div class="error-actions">
             <a href="{% url 'home' %}" class="btn-studio-primary btn-studio-lg">
                 <i class="bi bi-house"></i> Volver al Inicio
             </a>
@@ -36,21 +27,12 @@
             </button>
         </div>
 
-        <!-- Enlaces útiles -->
-        <div style="margin-top: var(--spacing-2xl); padding-top: var(--spacing-2xl); border-top: var(--border-width) solid var(--border-light);">
-            <p style="color: var(--text-tertiary); font-size: var(--font-size-sm); margin-bottom: var(--spacing-md);">
-                Enlaces útiles:
-            </p>
-            <div style="display: flex; gap: var(--spacing-lg); justify-content: center; flex-wrap: wrap;">
-                <a href="#servicios" style="color: var(--color-purple-primary); text-decoration: none; font-size: var(--font-size-sm);">
-                    <i class="bi bi-briefcase"></i> Servicios
-                </a>
-                <a href="#nosotros" style="color: var(--color-purple-primary); text-decoration: none; font-size: var(--font-size-sm);">
-                    <i class="bi bi-people"></i> Nosotros
-                </a>
-                <a href="#contacto" style="color: var(--color-purple-primary); text-decoration: none; font-size: var(--font-size-sm);">
-                    <i class="bi bi-envelope"></i> Contacto
-                </a>
+        <div class="error-links">
+            <p class="error-links-label">Enlaces útiles:</p>
+            <div class="error-links-list">
+                <a href="#servicios"><i class="bi bi-briefcase"></i> Servicios</a>
+                <a href="#nosotros"><i class="bi bi-people"></i> Nosotros</a>
+                <a href="#contacto"><i class="bi bi-envelope"></i> Contacto</a>
             </div>
         </div>
     </div>

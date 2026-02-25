@@ -1,0 +1,332 @@
+{% extends "base.html" %}
+{% load static %}
+{% load cotizaciones_tags %}
+
+{% block title %}Dashboard Económico - Estudio Rivarossa{% endblock %}
+
+{% block content %}
+<div class="container-studio py-4">
+    <!-- Encabezado + Botón Actualizar -->
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h2 class="page-heading">
+                <i class="bi bi-graph-up-arrow text-purple"></i> Dashboard Económico
+            </h2>
+            <p class="page-subtitle mb-0">
+                Indicadores financieros de Argentina en tiempo real
+            </p>
+        </div>
+        <div class="col-auto d-flex align-items-center gap-3">
+            <small id="refresh-countdown" class="refresh-countdown">
+                <i class="bi bi-clock-history"></i> Próxima actualización: <span id="countdown-seconds">300</span>s
+            </small>
+            <button type="button" class="btn-studio btn-studio-primary" id="btn-refresh" onclick="location.reload();">
+                <i class="bi bi-arrow-clockwise"></i> Actualizar
+            </button>
+        </div>
+    </div>
+
+    <!-- CARDS DE RESUMEN - Indicadores principales -->
+    <div class="row g-4 mb-4">
+        <!-- Riesgo País -->
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card-studio hover-lift text-center h-100">
+                <div class="indicator-icon stat-icon--red">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <h6 class="card-studio-title indicator-label">Riesgo País</h6>
+                <p class="indicator-value">
+                    {% if riesgo_ultimo and riesgo_ultimo.valor is not None %}
+                        {{ riesgo_ultimo.valor }}
+                    {% else %}
+                        <span class="indicator-no-data">&mdash;</span>
+                    {% endif %}
+                </p>
+                <small class="indicator-date">
+                    {% if riesgo_ultimo.fecha %}{{ riesgo_ultimo.fecha|formato_fecha_iso }}{% else %}Sin datos{% endif %}
+                </small>
+            </div>
+        </div>
+
+        <!-- Inflación Mensual -->
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card-studio hover-lift text-center h-100">
+                <div class="indicator-icon stat-icon--yellow">
+                    <i class="bi bi-percent"></i>
+                </div>
+                <h6 class="card-studio-title indicator-label">Inflación Mensual</h6>
+                <p class="indicator-value">
+                    {% if ultima_inflacion and ultima_inflacion.valor is not None %}
+                        {{ ultima_inflacion.valor }}%
+                    {% else %}
+                        <span class="indicator-no-data">&mdash;</span>
+                    {% endif %}
+                </p>
+                <small class="indicator-date">
+                    {% if ultima_inflacion.fecha %}{{ ultima_inflacion.fecha|formato_fecha_iso }}{% else %}Sin datos{% endif %}
+                </small>
+            </div>
+        </div>
+
+        <!-- Inflación Interanual -->
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card-studio hover-lift text-center h-100">
+                <div class="indicator-icon stat-icon--orange">
+                    <i class="bi bi-arrow-up-right-circle"></i>
+                </div>
+                <h6 class="card-studio-title indicator-label">Inflación Interanual</h6>
+                <p class="indicator-value">
+                    {% if ultima_inflacion_ia and ultima_inflacion_ia.valor is not None %}
+                        {{ ultima_inflacion_ia.valor }}%
+                    {% else %}
+                        <span class="indicator-no-data">&mdash;</span>
+                    {% endif %}
+                </p>
+                <small class="indicator-date">
+                    {% if ultima_inflacion_ia.fecha %}{{ ultima_inflacion_ia.fecha|formato_fecha_iso }}{% else %}Sin datos{% endif %}
+                </small>
+            </div>
+        </div>
+
+        <!-- UVA -->
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card-studio hover-lift text-center h-100">
+                <div class="indicator-icon stat-icon--purple">
+                    <i class="bi bi-bank"></i>
+                </div>
+                <h6 class="card-studio-title indicator-label">Índice UVA</h6>
+                <p class="indicator-value">
+                    {% if ultimo_uva and ultimo_uva.valor is not None %}
+                        {{ ultimo_uva.valor }}
+                    {% else %}
+                        <span class="indicator-no-data">&mdash;</span>
+                    {% endif %}
+                </p>
+                <small class="indicator-date">
+                    {% if ultimo_uva.fecha %}{{ ultimo_uva.fecha|formato_fecha_iso }}{% else %}Sin datos{% endif %}
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- COTIZACIONES DEL DÓLAR -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card-studio">
+                <div class="card-studio-header">
+                    <h5 class="card-header-title">
+                        <i class="bi bi-currency-dollar text-purple"></i> Cotizaciones del Dólar
+                    </h5>
+                </div>
+                <div class="card-studio-body">
+                    {% if dolares %}
+                    <div class="row g-3">
+                        {% for dolar in dolares %}
+                        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                            <div class="card-studio hover-lift card-studio-hover-purple text-center h-100">
+                                <div class="mb-2">
+                                    <span class="badge-studio badge-studio-purple">
+                                        {{ dolar.nombre|default:dolar.casa|default:"Dólar" }}
+                                    </span>
+                                </div>
+                                <div class="currency-card-body">
+                                    <div>
+                                        <small class="currency-label">Compra</small>
+                                        <span class="currency-buy">
+                                            {% if dolar.compra is not None %}
+                                                ${{ dolar.compra }}
+                                            {% else %}
+                                                &mdash;
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="currency-divider"></div>
+                                    <div>
+                                        <small class="currency-label">Venta</small>
+                                        <span class="currency-sell">
+                                            {% if dolar.venta is not None %}
+                                                ${{ dolar.venta }}
+                                            {% else %}
+                                                &mdash;
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                                {% if dolar.fechaActualizacion %}
+                                <small class="currency-updated">
+                                    <i class="bi bi-clock"></i> {{ dolar.fechaActualizacion|formato_fecha_iso }}
+                                </small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="chart-empty">
+                        <i class="bi bi-cloud-slash chart-empty-icon"></i>
+                        <p class="chart-empty-text">No se pudieron obtener las cotizaciones del dólar.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OTRAS MONEDAS -->
+    {% if cotizaciones %}
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card-studio">
+                <div class="card-studio-header">
+                    <h5 class="card-header-title">
+                        <i class="bi bi-cash-stack text-purple"></i> Otras Monedas
+                    </h5>
+                </div>
+                <div class="card-studio-body">
+                    <div class="row g-3">
+                        {% for moneda in cotizaciones %}
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="card-studio hover-lift card-studio-hover-purple text-center h-100">
+                                <div class="mb-2">
+                                    <span class="badge-studio badge-studio-dark">
+                                        {{ moneda.nombre|default:moneda.moneda|default:"Moneda" }}
+                                    </span>
+                                </div>
+                                <div class="currency-card-body">
+                                    <div>
+                                        <small class="currency-label">Compra</small>
+                                        <span class="currency-buy">
+                                            {% if moneda.compra is not None %}
+                                                ${{ moneda.compra }}
+                                            {% else %}
+                                                &mdash;
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="currency-divider"></div>
+                                    <div>
+                                        <small class="currency-label">Venta</small>
+                                        <span class="currency-sell">
+                                            {% if moneda.venta is not None %}
+                                                ${{ moneda.venta }}
+                                            {% else %}
+                                                &mdash;
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                                {% if moneda.fechaActualizacion %}
+                                <small class="currency-updated">
+                                    <i class="bi bi-clock"></i> {{ moneda.fechaActualizacion|formato_fecha_iso }}
+                                </small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- GRÁFICOS HISTÓRICOS - Chart.js -->
+    <div class="row g-4 mb-4">
+        <!-- Inflación Mensual -->
+        <div class="col-12 col-lg-6">
+            <div class="card-studio h-100">
+                <div class="card-studio-header">
+                    <h5 class="card-header-title">
+                        <i class="bi bi-bar-chart-line text-purple"></i> Inflación Mensual
+                    </h5>
+                    <span class="badge-studio badge-studio-outline">Últimos 24 meses</span>
+                </div>
+                <div class="card-studio-body">
+                    <canvas id="chart-inflacion" height="280"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inflación Interanual -->
+        <div class="col-12 col-lg-6">
+            <div class="card-studio h-100">
+                <div class="card-studio-header">
+                    <h5 class="card-header-title">
+                        <i class="bi bi-graph-up text-purple"></i> Inflación Interanual
+                    </h5>
+                    <span class="badge-studio badge-studio-outline">Últimos 24 meses</span>
+                </div>
+                <div class="card-studio-body">
+                    <canvas id="chart-inflacion-ia" height="280"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Índice UVA -->
+        <div class="col-12 col-lg-6">
+            <div class="card-studio h-100">
+                <div class="card-studio-header">
+                    <h5 class="card-header-title">
+                        <i class="bi bi-bank2 text-purple"></i> Índice UVA
+                    </h5>
+                    <span class="badge-studio badge-studio-outline">Últimos 60 registros</span>
+                </div>
+                <div class="card-studio-body">
+                    <canvas id="chart-uva" height="280"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Riesgo País -->
+        <div class="col-12 col-lg-6">
+            <div class="card-studio h-100">
+                <div class="card-studio-header">
+                    <h5 class="card-header-title">
+                        <i class="bi bi-shield-exclamation text-purple"></i> Riesgo País
+                    </h5>
+                    <span class="badge-studio badge-studio-outline">Últimos 60 días</span>
+                </div>
+                <div class="card-studio-body">
+                    <canvas id="chart-riesgo" height="280"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nota al pie -->
+    <div class="row">
+        <div class="col-12 text-center">
+            <p class="data-source-note">
+                <i class="bi bi-info-circle"></i>
+                Datos provistos por <a href="https://dolarapi.com" target="_blank" rel="noopener">DolarAPI</a>
+                y <a href="https://argentinadatos.com" target="_blank" rel="noopener">Argentina Datos</a>.
+                Las cotizaciones pueden tener demora.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+<!-- Puente de datos: Django → JavaScript -->
+<script>
+    window.COTIZACIONES_DATA = {
+        inflLabels:    {{ infl_labels|safe }},
+        inflValores:   {{ infl_valores|safe }},
+        inflIaLabels:  {{ infl_ia_labels|safe }},
+        inflIaValores: {{ infl_ia_valores|safe }},
+        uvaLabels:     {{ uva_labels|safe }},
+        uvaValores:    {{ uva_valores|safe }},
+        riesgoLabels:  {{ riesgo_labels|safe }},
+        riesgoValores: {{ riesgo_valores|safe }},
+    };
+</script>
+
+<!-- Lógica del dashboard económico -->
+<script src="{% static 'js/cotizaciones.js' %}?v=1.0"></script>
+{% endblock %}

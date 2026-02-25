@@ -1,0 +1,473 @@
+/* ═══════════════════════════════════════════════════════════════
+   pages.css  –  Clases reutilizables para reemplazar inline styles
+   en las distintas páginas del proyecto
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ────────────── Encabezados de página ────────────── */
+.page-heading {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+}
+
+.page-subtitle {
+    color: var(--text-secondary);
+    font-size: var(--font-size-lg);
+}
+
+/* ────────────── Stat cards (dashboard home) ────────────── */
+.stat-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.stat-icon--purple { color: var(--color-purple-primary); }
+.stat-icon--green  { color: #198754; }
+.stat-icon--yellow { color: #ffc107; }
+.stat-icon--red    { color: #dc3545; }
+.stat-icon--orange { color: #fd7e14; }
+
+.stat-number {
+    font-size: var(--font-size-5xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.stat-number--green  { color: #198754; }
+.stat-number--yellow { color: #ffc107; }
+
+/* ────────────── Card header title ────────────── */
+.card-header-title {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: var(--font-weight-semibold);
+}
+
+/* ────────────── Quick-access buttons ────────────── */
+.quick-access-btn {
+    padding: var(--spacing-lg);
+    height: 100%;
+    flex-direction: column;
+}
+
+.quick-access-btn i {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+/* ────────────── Panel de colaborador / cliente ────────────── */
+.panel-description {
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-lg);
+}
+
+.panel-feature-icon {
+    font-size: 2rem;
+    color: var(--color-purple-primary);
+}
+
+.panel-feature-title {
+    margin-top: var(--spacing-sm);
+}
+
+.panel-feature-text {
+    color: var(--text-tertiary);
+    font-size: var(--font-size-sm);
+}
+
+.panel-feature-cta {
+    margin-top: var(--spacing-sm);
+}
+
+/* ────────────── Empresa cards ────────────── */
+.empresa-name {
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.empresa-detail {
+    color: var(--text-tertiary);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-xs);
+}
+
+.empresa-detail:last-child {
+    margin-bottom: 0;
+}
+
+.empresa-divider {
+    border-top: var(--border-width) solid var(--border-light);
+    padding-top: var(--spacing-sm);
+    margin-top: auto;
+}
+
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-4xl);
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    color: var(--text-tertiary);
+    margin-bottom: var(--spacing-md);
+}
+
+.empty-state-text {
+    color: var(--text-tertiary);
+    font-size: var(--font-size-lg);
+    margin: 0;
+}
+
+/* ────────────── Cotizaciones dashboard ────────────── */
+.indicator-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.indicator-label {
+    font-size: var(--font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-tertiary);
+}
+
+.indicator-value {
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin: var(--spacing-xs) 0;
+}
+
+.indicator-date {
+    color: var(--text-tertiary);
+}
+
+.indicator-no-data {
+    color: var(--text-tertiary);
+}
+
+/* Dólar / moneda cards */
+.currency-card-body {
+    display: flex;
+    justify-content: space-around;
+    margin-top: var(--spacing-md);
+}
+
+.currency-card-body .currency-label {
+    color: var(--text-tertiary);
+    display: block;
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+}
+
+.currency-buy {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: #198754;
+}
+
+.currency-sell {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: #dc3545;
+}
+
+.currency-divider {
+    width: 1px;
+    background: var(--border-light);
+}
+
+.currency-updated {
+    color: var(--text-tertiary);
+    display: block;
+    margin-top: var(--spacing-sm);
+    font-size: var(--font-size-xs);
+}
+
+.chart-empty {
+    text-align: center;
+    padding: var(--spacing-2xl);
+}
+
+.chart-empty-icon {
+    font-size: 3rem;
+    color: var(--text-tertiary);
+}
+
+.chart-empty-text {
+    color: var(--text-tertiary);
+    margin-top: var(--spacing-md);
+}
+
+/* Refresh bar */
+.refresh-countdown {
+    color: var(--text-tertiary);
+    font-size: var(--font-size-sm);
+}
+
+.data-source-note {
+    color: var(--text-tertiary);
+    font-size: var(--font-size-sm);
+}
+
+.data-source-note a {
+    color: var(--text-accent);
+}
+
+/* ────────────── Perfil ────────────── */
+.profile-label {
+    color: var(--text-secondary);
+    font-weight: var(--font-weight-medium);
+}
+
+.profile-value {
+    color: var(--text-primary);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: 0;
+}
+
+.profile-link {
+    color: var(--color-purple-primary);
+    text-decoration: none;
+}
+
+.profile-link:hover {
+    text-decoration: underline;
+}
+
+.empresa-list-item {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--radius-md);
+    background-color: var(--bg-secondary);
+}
+
+.empresa-list-item + .empresa-list-item {
+    margin-top: var(--spacing-md);
+}
+
+.empresas-empty {
+    text-align: center;
+    padding: var(--spacing-xl) 0;
+    color: var(--text-secondary);
+}
+
+.empresas-empty-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-md);
+    opacity: 0.4;
+}
+
+/* ────────────── Error pages (404, 500) ────────────── */
+.error-page {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-2xl);
+}
+
+.error-content {
+    text-align: center;
+    max-width: 600px;
+}
+
+.error-icon {
+    font-size: 8rem;
+    opacity: 0.8;
+    margin-bottom: var(--spacing-2xl);
+}
+
+.error-icon--purple { color: var(--color-purple-primary); }
+.error-icon--red    { color: #dc3545; }
+
+.error-code {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-5xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.error-title {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-lg);
+}
+
+.error-description {
+    color: var(--text-secondary);
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-relaxed);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.error-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.error-links {
+    margin-top: var(--spacing-2xl);
+    padding-top: var(--spacing-2xl);
+    border-top: var(--border-width) solid var(--border-light);
+}
+
+.error-links-label {
+    color: var(--text-tertiary);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.error-links-list {
+    display: flex;
+    gap: var(--spacing-lg);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.error-links-list a {
+    color: var(--color-purple-primary);
+    text-decoration: none;
+    font-size: var(--font-size-sm);
+}
+
+.error-links-list a:hover {
+    text-decoration: underline;
+}
+
+/* ────────────── Landing page ────────────── */
+.section-text {
+    font-size: var(--font-size-lg);
+    color: var(--text-secondary);
+    line-height: var(--line-height-relaxed);
+}
+
+.values-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.value-icon {
+    font-size: 1.5rem;
+    color: var(--color-purple-primary);
+    flex-shrink: 0;
+}
+
+.value-name {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-xs);
+}
+
+.value-description {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.why-us-title {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-lg);
+    text-align: center;
+}
+
+.why-us-item h4 {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-purple-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.why-us-item p {
+    color: var(--text-secondary);
+}
+
+.service-icon {
+    font-size: 3rem;
+    color: var(--color-purple-primary);
+}
+
+.service-list {
+    text-align: left;
+    list-style: none;
+    padding: 0;
+    margin-top: var(--spacing-md);
+}
+
+.service-list li {
+    padding: 2px 0;
+}
+
+.contact-icon {
+    font-size: 2.5rem;
+    color: var(--color-purple-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.contact-text {
+    color: var(--text-secondary);
+}
+
+.contact-link {
+    color: var(--color-purple-primary);
+}
+
+/* ────────────── Sections (landing) ────────────── */
+.section--alt {
+    background-color: var(--bg-secondary);
+}
+
+.section-title--left {
+    text-align: left;
+}
+
+.glass-padded {
+    padding: var(--spacing-2xl);
+}
+
+/* ────────────── Profile status badges ────────────── */
+.badge-studio-success {
+    background-color: rgba(25, 135, 84, 0.12);
+    color: #198754;
+}
+
+.badge-studio-warning {
+    background-color: rgba(255, 193, 7, 0.15);
+    color: #856404;
+}
+
+/* ────────────── Profile detail list ────────────── */
+.profile-dl {
+    row-gap: var(--spacing-md);
+}
+
+.profile-dd {
+    margin-bottom: 0;
+}
+
+/* ────────────── Footer social & links ────────────── */
+.footer-social {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.footer-description {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: var(--spacing-md);
+}
+
+.footer-contact-item {
+    color: rgba(255, 255, 255, 0.8);
+    padding: var(--spacing-xs) 0;
+}

@@ -1,5 +1,5 @@
-# Incluye vistas para login, logout, activación de cuenta, recuperación de contraseña y dashboard principal.
 import logging
+import uuid
 from datetime import timedelta
 
 from django.conf import settings
@@ -19,26 +19,20 @@ logger = logging.getLogger(__name__)
 
 
 def login_view(request):
-    # Vista de inicio de sesión, Muestra formulario de login y autentica usuario por email y contraseña. Redirige al dashboard si la autenticación es exitosa.
-    # Si el usuario ya está autenticado, redirigir al home
     if request.user.is_authenticated:
-        return redirect('home')
+        return redirect('dashboard')
 
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
             user = form.cleaned_data['user']
-
-            # Configurar duración de sesión según "Recordarme"
             if not form.cleaned_data.get('recordarme'):
-                request.session.set_expiry(0)  # Cierra al cerrar navegador
+                request.session.set_expiry(0)  
             else:
                 request.session.set_expiry(86400 * 30)  # 30 días
 
             login(request, user)
             messages.success(request, f'¡Bienvenido/a, {user.get_full_name()}!')
-
-            # Redirigir a URL solicitada o al home
             next_url = request.GET.get('next', '/')
             return redirect(next_url)
     else:
@@ -48,14 +42,12 @@ def login_view(request):
 
 
 def logout_view(request):
-    # Vista de cierre de sesión. Cierra la sesión del usuario y redirige al login.
     logout(request)
     messages.info(request, 'Has cerrado sesión correctamente.')
     return redirect('login')
 
 
 def activate_view(request, token):
-    # Vista de activación de cuenta. Valida el token de activación y muestra formulario para establecer la contraseña inicial del usuario.
     try:
         token_obj = TokenActivacion.objects.get(
             token=token,
@@ -129,7 +121,6 @@ def password_reset_view(request):
                         }
                     )
                     # Regenerar token
-                    import uuid
                     token_obj.token = str(uuid.uuid4())
                     token_obj.save(update_fields=['token'])
 
@@ -250,26 +241,3 @@ def perfil_view(request):
         'empresas': empresas,
     }
     return render(request, 'usuarios/perfil.html', contexto)
-
-
-@login_required
-def home_view(request):
-    # Vista del dashboard principal. Requiere autenticación. Muestra información diferente según el rol del usuario.
-    usuario = request.user
-
-    contexto = {
-        'usuario': usuario,
-        'empresas': usuario.empresas.filter(estado='activo'),
-    }
-
-    # Información adicional según rol
-    if usuario.rol == 'Administrador':
-        contexto['total_usuarios'] = Usuario.objects.count()
-        contexto['usuarios_pendientes'] = Usuario.objects.filter(
-            estado='pendiente'
-        ).count()
-        contexto['usuarios_activos'] = Usuario.objects.filter(
-            estado='verificado', is_active=True
-        ).count()
-
-    return render(request, 'home.html', contexto)

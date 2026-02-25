@@ -4,30 +4,21 @@
 {% block title %}Error del Servidor - Estudio Rivarossa{% endblock %}
 
 {% block content %}
-<div style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: var(--spacing-2xl);">
-    <div style="text-align: center; max-width: 600px;">
-        <!-- Icono animado -->
-        <div style="margin-bottom: var(--spacing-2xl);">
-            <i class="bi bi-exclamation-triangle" style="font-size: 8rem; color: #dc3545; opacity: 0.8;"></i>
+<div class="error-page">
+    <div class="error-content">
+        <div class="error-icon error-icon--red">
+            <i class="bi bi-exclamation-triangle"></i>
         </div>
 
-        <!-- Código de error -->
-        <h1 style="font-family: var(--font-heading); font-size: var(--font-size-5xl); font-weight: var(--font-weight-bold); color: var(--text-primary); margin-bottom: var(--spacing-md);">
-            500
-        </h1>
+        <h1 class="error-code">500</h1>
+        <h2 class="error-title">Error del Servidor</h2>
 
-        <!-- Mensaje -->
-        <h2 style="font-family: var(--font-heading); font-size: var(--font-size-2xl); font-weight: var(--font-weight-semibold); color: var(--text-primary); margin-bottom: var(--spacing-lg);">
-            Error del Servidor
-        </h2>
-
-        <p style="color: var(--text-secondary); font-size: var(--font-size-lg); line-height: var(--line-height-relaxed); margin-bottom: var(--spacing-2xl);">
-            Algo salió mal en nuestro servidor. Nuestro equipo técnico ya está trabajando para solucionar el problema. 
+        <p class="error-description">
+            Algo salió mal en nuestro servidor. Nuestro equipo técnico ya está trabajando para solucionar el problema.
             Por favor, intenta nuevamente más tarde.
         </p>
 
-        <!-- Botones de acción -->
-        <div style="display: flex; gap: var(--spacing-md); justify-content: center; flex-wrap: wrap;">
+        <div class="error-actions">
             <a href="{% url 'home' %}" class="btn-studio-primary btn-studio-lg">
                 <i class="bi bi-house"></i> Volver al Inicio
             </a>
@@ -36,12 +27,9 @@
             </button>
         </div>
 
-        <!-- Información de contacto -->
-        <div style="margin-top: var(--spacing-2xl); padding-top: var(--spacing-2xl); border-top: var(--border-width) solid var(--border-light);">
-            <p style="color: var(--text-tertiary); font-size: var(--font-size-sm); margin-bottom: var(--spacing-sm);">
-                Si el problema persiste, contáctanos:
-            </p>
-            <a href="mailto:info@estudiorivarossa.com" style="color: var(--color-purple-primary); text-decoration: none; font-size: var(--font-size-base);">
+        <div class="error-links">
+            <p class="error-links-label">Si el problema persiste, contáctanos:</p>
+            <a href="mailto:info@estudiorivarossa.com" class="profile-link">
                 <i class="bi bi-envelope"></i> info@estudiorivarossa.com
             </a>
         </div>

@@ -1,144 +1,105 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Activar Cuenta - Estudio{% endblock %}
+{% block title %}Activar Cuenta - Estudio Rivarossa{% endblock %}
+
+{% block extra_css %}
+<script>document.documentElement.classList.add('page-auth');</script>
+{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center align-items-center min-vh-100">
-        <div class="col-12 col-sm-8 col-md-6 col-lg-4">
-            <div class="card shadow border-0">
-                <div class="card-body p-4 p-md-5">
-                    <!-- Título -->
-                    <div class="text-center mb-4">
-                        <h2 class="fw-bold text-primary">
-                            <i class="bi bi-shield-check"></i>
-                        </h2>
-                        <h4 class="fw-bold">Activar Cuenta</h4>
-                        <p class="text-muted">
-                            ¡Hola {{ usuario.nombre }}! Establece tu contraseña para activar tu cuenta.
-                        </p>
-                    </div>
+<div class="auth-page">
+    <div class="auth-wrapper">
+        <div class="card-studio glass auth-card">
+            <!-- Título -->
+            <div class="auth-header">
+                <div class="auth-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <h2 class="auth-title">Activar Cuenta</h2>
+                <p class="auth-subtitle">
+                    ¡Hola {{ usuario.nombre }}! Establecé tu contraseña para activar tu cuenta.
+                </p>
+            </div>
 
-                    <!-- Errores del formulario -->
-                    {% if form.non_field_errors %}
-                    <div class="alert alert-danger py-2" role="alert">
-                        {% for error in form.non_field_errors %}
-                        <small><i class="bi bi-exclamation-triangle-fill"></i> {{ error }}</small>
-                        {% if not forloop.last %}<br>{% endif %}
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-
-                    <!-- Formulario -->
-                    <form method="post" novalidate id="activateForm">
-                        {% csrf_token %}
-
-                        <!-- Contraseña -->
-                        <div class="mb-3">
-                            <label for="{{ form.password1.id_for_label }}" class="form-label">
-                                <i class="bi bi-lock"></i> Contraseña
-                            </label>
-                            <div class="input-group">
-                                {{ form.password1 }}
-                                <button class="btn btn-outline-secondary"
-                                        type="button"
-                                        onclick="togglePassword('id_password1', this)"
-                                        title="Mostrar/ocultar contraseña">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                            </div>
-                            {% if form.password1.errors %}
-                            <div class="invalid-feedback d-block">
-                                {% for error in form.password1.errors %}{{ error }}{% endfor %}
-                            </div>
-                            {% endif %}
-                            <div class="form-text small">
-                                <ul class="list-unstyled mb-0 mt-1">
-                                    <li id="req-length"><i class="bi bi-x-circle text-danger"></i> Mínimo 8 caracteres</li>
-                                    <li id="req-upper"><i class="bi bi-x-circle text-danger"></i> Al menos una mayúscula</li>
-                                    <li id="req-number"><i class="bi bi-x-circle text-danger"></i> Al menos un número</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <!-- Confirmar contraseña -->
-                        <div class="mb-4">
-                            <label for="{{ form.password2.id_for_label }}" class="form-label">
-                                <i class="bi bi-lock-fill"></i> Confirmar contraseña
-                            </label>
-                            <div class="input-group">
-                                {{ form.password2 }}
-                                <button class="btn btn-outline-secondary"
-                                        type="button"
-                                        onclick="togglePassword('id_password2', this)"
-                                        title="Mostrar/ocultar contraseña">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                            </div>
-                            {% if form.password2.errors %}
-                            <div class="invalid-feedback d-block">
-                                {% for error in form.password2.errors %}{{ error }}{% endfor %}
-                            </div>
-                            {% endif %}
-                            <div id="matchFeedback" class="form-text small" style="display: none;"></div>
-                        </div>
-
-                        <!-- Botón -->
-                        <button type="submit" class="btn btn-primary w-100 py-2">
-                            <i class="bi bi-check-circle"></i> Activar mi cuenta
-                        </button>
-                    </form>
+            <!-- Errores del formulario -->
+            {% if form.non_field_errors %}
+            <div class="alert-studio alert-studio-error mb-3">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <div>
+                    {% for error in form.non_field_errors %}
+                    {{ error }}{% if not forloop.last %}<br>{% endif %}
+                    {% endfor %}
                 </div>
             </div>
+            {% endif %}
+
+            <!-- Formulario -->
+            <form method="post" novalidate id="activateForm">
+                {% csrf_token %}
+
+                <!-- Contraseña -->
+                <div class="auth-field">
+                    <label for="{{ form.password1.id_for_label }}" class="form-label auth-label">
+                        <i class="bi bi-lock"></i> Contraseña
+                    </label>
+                    <div class="auth-password-wrapper">
+                        {{ form.password1 }}
+                        <button class="auth-password-toggle"
+                                type="button"
+                                onclick="window.togglePassword('id_password1', this)"
+                                title="Mostrar/ocultar contraseña">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    {% if form.password1.errors %}
+                    <div class="auth-field-error">
+                        {% for error in form.password1.errors %}{{ error }}{% endfor %}
+                    </div>
+                    {% endif %}
+                    <ul class="password-requirements mt-1">
+                        <li id="req-length"><i class="bi bi-x-circle text-danger"></i> Mínimo 8 caracteres</li>
+                        <li id="req-upper"><i class="bi bi-x-circle text-danger"></i> Al menos una mayúscula</li>
+                        <li id="req-number"><i class="bi bi-x-circle text-danger"></i> Al menos un número</li>
+                    </ul>
+                </div>
+
+                <!-- Confirmar contraseña -->
+                <div class="auth-field">
+                    <label for="{{ form.password2.id_for_label }}" class="form-label auth-label">
+                        <i class="bi bi-lock-fill"></i> Confirmar contraseña
+                    </label>
+                    <div class="auth-password-wrapper">
+                        {{ form.password2 }}
+                        <button class="auth-password-toggle"
+                                type="button"
+                                onclick="window.togglePassword('id_password2', this)"
+                                title="Mostrar/ocultar contraseña">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    {% if form.password2.errors %}
+                    <div class="auth-field-error">
+                        {% for error in form.password2.errors %}{{ error }}{% endfor %}
+                    </div>
+                    {% endif %}
+                    <div id="matchFeedback" class="password-match-feedback"></div>
+                </div>
+
+                <!-- Botón -->
+                <button type="submit" class="btn-studio-primary auth-submit">
+                    <i class="bi bi-check-circle"></i> Activar mi cuenta
+                </button>
+            </form>
         </div>
+
+        <p class="auth-footer">
+            &copy; {% now "Y" %} Estudio Rivarossa y Asociados
+        </p>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    // Validación en tiempo real de requisitos de contraseña
-    const password1 = document.getElementById('id_password1');
-    const password2 = document.getElementById('id_password2');
-
-    if (password1) {
-        password1.addEventListener('input', function() {
-            const val = this.value;
-            updateReq('req-length', val.length >= 8);
-            updateReq('req-upper', /[A-Z]/.test(val));
-            updateReq('req-number', /[0-9]/.test(val));
-            checkMatch();
-        });
-    }
-
-    if (password2) {
-        password2.addEventListener('input', checkMatch);
-    }
-
-    function updateReq(id, valid) {
-        const el = document.getElementById(id);
-        if (el) {
-            const icon = el.querySelector('i');
-            if (valid) {
-                icon.className = 'bi bi-check-circle text-success';
-            } else {
-                icon.className = 'bi bi-x-circle text-danger';
-            }
-        }
-    }
-
-    function checkMatch() {
-        const feedback = document.getElementById('matchFeedback');
-        if (password2.value) {
-            feedback.style.display = 'block';
-            if (password1.value === password2.value) {
-                feedback.innerHTML = '<i class="bi bi-check-circle text-success"></i> Las contraseñas coinciden';
-            } else {
-                feedback.innerHTML = '<i class="bi bi-x-circle text-danger"></i> Las contraseñas no coinciden';
-            }
-        } else {
-            feedback.style.display = 'none';
-        }
-    }
-</script>
+<script src="{% static 'js/password-validation.js' %}?v=2.1"></script>
 {% endblock %}

@@ -10,7 +10,6 @@ from .models import TokenActivacion
 
 logger = logging.getLogger(__name__)
 
-
 def enviar_email_activacion_usuario(usuario):
     try:
         # Crear o actualizar token

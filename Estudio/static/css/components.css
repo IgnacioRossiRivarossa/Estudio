@@ -1,14 +1,3 @@
-/* =============================================================================
-   ESTUDIO RIVAROSSA Y ASOCIADOS
-   Componentes Atómicos - Design System
-   Arquitectura modular para máxima reutilización y escalabilidad
-   ============================================================================= */
-
-/* =============================================================================
-   ÁTOMOS - Elementos Básicos
-   ============================================================================= */
-
-/* --- Botones Corporativos --- */
 .btn-studio {
     display: inline-flex;
     align-items: center;
@@ -165,11 +154,6 @@
     height: 3rem;
 }
 
-/* =============================================================================
-   MOLÉCULAS - Componentes Compuestos
-   ============================================================================= */
-
-/* --- Cards Corporativas --- */
 .card-studio {
     background-color: var(--bg-primary);
     border: var(--border-width) solid var(--border-color);
@@ -326,11 +310,6 @@
     transform: translateX(-50%) translateY(-4px);
 }
 
-/* =============================================================================
-   ORGANISMOS - Secciones Complejas
-   ============================================================================= */
-
-/* --- Hero Section --- */
 .hero-studio {
     position: relative;
     min-height: 600px;
@@ -477,10 +456,6 @@
     font-size: var(--font-size-sm);
 }
 
-/* =============================================================================
-   ANIMACIONES
-   ============================================================================= */
-
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -516,10 +491,6 @@
     animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* =============================================================================
-   MICRO-INTERACCIONES
-   ============================================================================= */
-
 .hover-lift {
     transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
@@ -542,10 +513,6 @@
     outline-offset: 2px;
     border-radius: var(--radius-sm);
 }
-
-/* =============================================================================
-   UTILIDADES RESPONSIVAS
-   ============================================================================= */
 
 @media (max-width: 768px) {
     .hero-studio-title {

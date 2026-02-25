@@ -1,19 +1,9 @@
-/* =============================================================================
-   ESTUDIO RIVAROSSA Y ASOCIADOS
-   Sistema de Variables CSS - Design System
-   Paleta de colores corporativa y sistema de temas (Light/Dark Mode)
-   ============================================================================= */
-
-:root {
-    /* =========================================================================
-       PALETA DE COLORES CORPORATIVA
-       ========================================================================= */
-    
+:root {    
     /* Colores principales del estudio */
-    --color-purple-primary: #8C4F9F;        /* Púrpura vibrante - Acentos y acciones */
-    --color-blue-dark: #233142;             /* Azul grisáceo oscuro - Tipografía y sobriedad */
-    --color-gray-light: #D9D9D9;            /* Gris claro - Separadores y fondos sutiles */
-    --color-white: #FFFFFF;                 /* Blanco - Base de limpieza visual */
+    --color-purple-primary: #8C4F9F;        
+    --color-blue-dark: #233142;             
+    --color-gray-light: #D9D9D9;            
+    --color-white: #FFFFFF;                 
     
     /* Variaciones de púrpura */
     --color-purple-hover: #9c5fb0;
@@ -36,10 +26,6 @@
     --color-gray-lighter: #e8e8e8;
     --color-gray-lightest: #f5f5f5;
     --color-gray-medium: #888888;
-    
-    /* =========================================================================
-       TEMA LIGHT (Por defecto)
-       ========================================================================= */
     
     /* Fondos */
     --bg-primary: #FFFFFF;
@@ -80,10 +66,6 @@
     --color-danger-text: #b02a37;
     --color-danger-border: #dc3545;
     
-    /* =========================================================================
-       TIPOGRAFÍA
-       ========================================================================= */
-    
     /* Familias tipográficas */
     --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     --font-heading: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -114,10 +96,6 @@
     --line-height-relaxed: 1.75;
     --line-height-loose: 2;
     
-    /* =========================================================================
-       ESPACIADO
-       ========================================================================= */
-    
     --spacing-xs: 0.25rem;    /* 4px */
     --spacing-sm: 0.5rem;     /* 8px */
     --spacing-md: 1rem;       /* 16px */
@@ -126,11 +104,6 @@
     --spacing-2xl: 3rem;      /* 48px */
     --spacing-3xl: 4rem;      /* 64px */
     --spacing-4xl: 6rem;      /* 96px */
-    
-    /* =========================================================================
-       BORDES Y RADIOS
-       ========================================================================= */
-    
     --radius-none: 0;
     --radius-sm: 0.25rem;     /* 4px */
     --radius-md: 0.5rem;      /* 8px */
@@ -142,10 +115,6 @@
     --border-width: 1px;
     --border-width-thick: 2px;
     
-    /* =========================================================================
-       TRANSICIONES Y ANIMACIONES
-       ========================================================================= */
-    
     --transition-fast: 150ms ease;
     --transition-base: 250ms ease;
     --transition-slow: 350ms ease;
@@ -155,10 +124,6 @@
     --easing-decelerate: cubic-bezier(0, 0, 0.2, 1);
     --easing-accelerate: cubic-bezier(0.4, 0, 1, 1);
     
-    /* =========================================================================
-       Z-INDEX
-       ========================================================================= */
-    
     --z-dropdown: 1000;
     --z-sticky: 1020;
     --z-fixed: 1030;
@@ -167,20 +132,12 @@
     --z-popover: 1060;
     --z-tooltip: 1070;
     
-    /* =========================================================================
-       BREAKPOINTS (para uso en JavaScript)
-       ========================================================================= */
-    
     --breakpoint-sm: 576px;
     --breakpoint-md: 768px;
     --breakpoint-lg: 992px;
     --breakpoint-xl: 1200px;
     --breakpoint-xxl: 1400px;
 }
-
-/* =============================================================================
-   DARK MODE - Tema Oscuro Elegante
-   ============================================================================= */
 
 [data-theme="dark"] {
     /* Fondos en modo oscuro */
@@ -223,21 +180,12 @@
     --color-danger-border: #dc3545;
 }
 
-/* =============================================================================
-   CLASES DE UTILIDAD PARA TEMAS
-   ============================================================================= */
-
 .theme-transition {
     transition: background-color var(--transition-base),
                 color var(--transition-base),
                 border-color var(--transition-base);
 }
 
-/**
- * Transiciones suaves durante el cambio de tema.
- * Se aplica solo a elementos que usan variables de tema,
- * evitando penalizar el rendimiento con el selector universal *.
- */
 body,
 .navbar-studio,
 .card, .card-studio,
@@ -258,10 +206,6 @@ body,
                 border-color var(--transition-base),
                 box-shadow var(--transition-base);
 }
-
-/* =============================================================================
-   PREFERENCIA DE SISTEMA (PREFERS-COLOR-SCHEME)
-   ============================================================================= */
 
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {

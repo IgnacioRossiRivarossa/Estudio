@@ -1,64 +1,28 @@
-/**
- * =============================================================================
- * ESTUDIO RIVAROSSA Y ASOCIADOS
- * JavaScript Principal - ES6+
- * 
- * Funcionalidades:
- * - Dark Mode Toggle
- * - Micro-interacciones
- * - Animaciones suaves
- * - Validaciones de formularios
- * - Mejoras de UX/UI
- * =============================================================================
- */
-
 'use strict';
-
-// =============================================================================
-// DARK MODE - Sistema de temas
-// =============================================================================
 
 const ThemeManager = (() => {
     const THEME_KEY = 'estudio-theme';
     const THEME_ATTRIBUTE = 'data-theme';
-    
-    /**
-     * Obtiene el tema actual (de localStorage o del sistema)
-     */
     const getCurrentTheme = () => {
         const savedTheme = localStorage.getItem(THEME_KEY);
         if (savedTheme) {
             return savedTheme;
         }
-        
-        // Si no hay tema guardado, usar preferencia del sistema
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             return 'dark';
         }
         
         return 'light';
     };
-    
-    /**
-     * Aplica el tema al documento
-     */
     const applyTheme = (theme) => {
         document.documentElement.setAttribute(THEME_ATTRIBUTE, theme);
         localStorage.setItem(THEME_KEY, theme);
-        
-        // Actualizar meta theme-color para la barra del navegador móvil
         const metaThemeColor = document.querySelector('meta[name="theme-color"]');
         if (metaThemeColor) {
             metaThemeColor.setAttribute('content', theme === 'dark' ? '#1a1d24' : '#8C4F9F');
         }
-        
-        // Actualizar ícono del toggle
         updateThemeIcon(theme);
     };
-    
-    /**
-     * Actualiza el ícono del botón de tema
-     */
     const updateThemeIcon = (theme) => {
         const toggleButtons = document.querySelectorAll('.theme-toggle');
         toggleButtons.forEach(button => {
@@ -72,31 +36,18 @@ const ThemeManager = (() => {
             }
         });
     };
-    
-    /**
-     * Alterna entre tema claro y oscuro
-     */
     const toggleTheme = () => {
         const currentTheme = getCurrentTheme();
         const newTheme = currentTheme === 'light' ? 'dark' : 'light';
         applyTheme(newTheme);
     };
-    
-    /**
-     * Inicializa el sistema de temas
-     */
     const init = () => {
-        // Aplicar tema inicial
         const initialTheme = getCurrentTheme();
         applyTheme(initialTheme);
-        
-        // Configurar toggles
         const toggleButtons = document.querySelectorAll('.theme-toggle');
         toggleButtons.forEach(button => {
             button.addEventListener('click', toggleTheme);
         });
-        
-        // Escuchar cambios en preferencia del sistema
         if (window.matchMedia) {
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
                 if (!localStorage.getItem(THEME_KEY)) {
@@ -105,7 +56,6 @@ const ThemeManager = (() => {
             });
         }
     };
-    
     return {
         init,
         toggleTheme,
@@ -114,14 +64,7 @@ const ThemeManager = (() => {
     };
 })();
 
-// =============================================================================
-// ANIMACIONES Y MICRO-INTERACCIONES
-// =============================================================================
-
 const AnimationManager = (() => {
-    /**
-     * Animación de entrada para elementos
-     */
     const fadeInElements = () => {
         const elements = document.querySelectorAll('[data-animate="fade-in"]');
         
@@ -148,10 +91,7 @@ const AnimationManager = (() => {
         
         elements.forEach(element => observer.observe(element));
     };
-    
-    /**
-     * Animación de cards con delay progresivo
-     */
+
     const animateCards = () => {
         const cards = document.querySelectorAll('.card, .card-studio');
         cards.forEach((card, index) => {
@@ -165,10 +105,7 @@ const AnimationManager = (() => {
             }, index * 80);
         });
     };
-    
-    /**
-     * Smooth scroll para enlaces internos
-     */
+
     const initSmoothScroll = () => {
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
@@ -186,10 +123,7 @@ const AnimationManager = (() => {
             });
         });
     };
-    
-    /**
-     * Efecto de paralaje sutil en el hero
-     */
+
     const initParallax = () => {
         const hero = document.querySelector('.hero-studio');
         if (!hero) return;
@@ -199,10 +133,7 @@ const AnimationManager = (() => {
             hero.style.transform = `translateY(${scrolled * 0.5}px)`;
         });
     };
-    
-    /**
-     * Contador animado para estadísticas
-     */
+
     const animateCounters = () => {
         const counters = document.querySelectorAll('[data-count]');
         
@@ -245,14 +176,7 @@ const AnimationManager = (() => {
     return { init };
 })();
 
-// =============================================================================
-// ALERTAS Y NOTIFICACIONES
-// =============================================================================
-
 const AlertManager = (() => {
-    /**
-     * Auto-cierre de alertas después de un tiempo
-     */
     const initAutoClose = () => {
         const alerts = document.querySelectorAll('.alert-dismissible');
         alerts.forEach(alert => {
@@ -264,10 +188,7 @@ const AlertManager = (() => {
             }, 5000);
         });
     };
-    
-    /**
-     * Crea una alerta dinámica
-     */
+
     const createAlert = (message, type = 'info', dismissible = true) => {
         const alertDiv = document.createElement('div');
         alertDiv.className = `alert alert-${type} ${dismissible ? 'alert-dismissible fade show' : ''} alert-studio-${type}`;
@@ -281,10 +202,7 @@ const AlertManager = (() => {
         
         return alertDiv;
     };
-    
-    /**
-     * Obtiene el ícono según el tipo de alerta
-     */
+
     const getIconForType = (type) => {
         const icons = {
             'success': 'bi-check-circle-fill',
@@ -305,14 +223,7 @@ const AlertManager = (() => {
     };
 })();
 
-// =============================================================================
-// FORMULARIOS
-// =============================================================================
-
 const FormManager = (() => {
-    /**
-     * Alterna la visibilidad de un campo de contraseña
-     */
     const togglePassword = (inputId, button) => {
         const input = document.getElementById(inputId);
         if (!input) return;
@@ -326,18 +237,12 @@ const FormManager = (() => {
             if (icon) icon.className = 'bi bi-eye';
         }
     };
-    
-    /**
-     * Validación de email
-     */
+
     const isValidEmail = (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     };
-    
-    /**
-     * Validación de contraseña
-     */
+
     const validatePassword = (password) => {
         return {
             length: password.length >= 8,
@@ -347,10 +252,7 @@ const FormManager = (() => {
             special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
         };
     };
-    
-    /**
-     * Validación de formularios en tiempo real
-     */
+
     const initFormValidation = () => {
         const forms = document.querySelectorAll('.needs-validation');
         
@@ -364,10 +266,7 @@ const FormManager = (() => {
             }, false);
         });
     };
-    
-    /**
-     * Feedback visual mejorado para inputs
-     */
+
     const initInputFeedback = () => {
         const inputs = document.querySelectorAll('.input-studio, .form-control');
         
@@ -385,8 +284,6 @@ const FormManager = (() => {
     const init = () => {
         initFormValidation();
         initInputFeedback();
-        
-        // Exponer togglePassword como global para uso en templates
         window.togglePassword = togglePassword;
     };
     
@@ -398,14 +295,7 @@ const FormManager = (() => {
     };
 })();
 
-// =============================================================================
-// NAVBAR - Scroll behavior
-// =============================================================================
-
 const NavbarManager = (() => {
-    /**
-     * Navbar con sombra al hacer scroll
-     */
     const initScrollBehavior = () => {
         const navbar = document.querySelector('.navbar, .navbar-studio');
         if (!navbar) return;
@@ -428,21 +318,10 @@ const NavbarManager = (() => {
     return { init };
 })();
 
-// =============================================================================
-// UTILIDADES GENERALES
-// =============================================================================
-
 const Utils = (() => {
-    /**
-     * Confirmación de acciones
-     */
     const confirmAction = (message) => {
         return confirm(message || '¿Estás seguro de realizar esta acción?');
     };
-    
-    /**
-     * Copiar texto al portapapeles
-     */
     const copyToClipboard = async (text) => {
         try {
             await navigator.clipboard.writeText(text);
@@ -452,17 +331,9 @@ const Utils = (() => {
             return false;
         }
     };
-    
-    /**
-     * Detectar dispositivo móvil
-     */
     const isMobile = () => {
         return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     };
-    
-    /**
-     * Debounce para optimizar eventos
-     */
     const debounce = (func, wait) => {
         let timeout;
         return function executedFunction(...args) {
@@ -483,19 +354,13 @@ const Utils = (() => {
     };
 })();
 
-// =============================================================================
-// INICIALIZACIÓN
-// =============================================================================
-
 document.addEventListener('DOMContentLoaded', () => {
-    // Inicializar todos los módulos
     ThemeManager.init();
     AnimationManager.init();
     AlertManager.init();
     FormManager.init();
     NavbarManager.init();
     
-    // Prevención de envío múltiple de formularios
     const forms = document.querySelectorAll('form');
     forms.forEach(form => {
         form.addEventListener('submit', () => {
@@ -506,7 +371,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitBtn.innerHTML =
                     '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Procesando...';
 
-                // Re-habilitar después de 10 segundos (por si hay un error)
                 setTimeout(() => {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = submitBtn.getAttribute('data-original-text') || 'Enviar';
@@ -519,7 +383,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('%cSistema inicializado correctamente', 'color: #233142; font-size: 12px;');
 });
 
-// Exponer utilidades globales
 window.EstudioUtils = Utils;
 window.EstudioTheme = ThemeManager;
 window.EstudioAlerts = AlertManager;

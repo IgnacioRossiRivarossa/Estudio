@@ -1,10 +1,7 @@
 from django import forms
 from django.contrib.auth import authenticate, password_validation
 from django.core.exceptions import ValidationError
-
 from .models import Usuario
-
-
 class LoginForm(forms.Form):
     email = forms.EmailField(
         label='Correo electrónico',
