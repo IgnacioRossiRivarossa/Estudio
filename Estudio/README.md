@@ -142,11 +142,31 @@ Estudio/
 │   ├── admin.py
 │   └── models.py                # Empresa con validación CUIT
 │
+├── cotizaciones/                # App de indicadores económicos (sin modelos propios)
+│   ├── services.py              # Consumo de APIs externas (dólar, inflación, UVA, riesgo país)
+│   ├── urls.py
+│   ├── views.py
+│   └── templatetags/
+│       └── cotizaciones_tags.py
+│
+├── cuentas_corrientes/          # App de cuentas corrientes
+│   ├── models.py                # ClienteCC, MesCC, ConfiguracionMeses
+│   ├── urls.py
+│   ├── views.py                 # Lista, edición AJAX, nuevo mes, exportar, importar
+│   └── templatetags/
+│       └── cc_tags.py
+│
 ├── templates/
 │   ├── base.html                # Layout base (navbar, footer)
 │   ├── home.html                # Dashboard principal
 │   ├── 404.html
 │   ├── 500.html
+│   ├── cotizaciones/
+│   │   └── dashboard.html       # Dashboard de indicadores económicos
+│   ├── cuentas_corrientes/
+│   │   ├── lista.html           # Tabla principal con edición inline
+│   │   ├── nuevo_mes.html       # Carga de facturación mensual por Excel
+│   │   └── importar.html        # Importación masiva inicial (solo admin+staff)
 │   ├── usuarios/
 │   │   ├── login.html
 │   │   ├── perfil.html          # Perfil del usuario autenticado
@@ -161,8 +181,15 @@ Estudio/
 │   ├── css/
 │   │   ├── variables.css        # Design system (tokens de diseño)
 │   │   ├── components.css       # Componentes reutilizables
-│   │   └── custom.css
-│   ├── js/main.js
+│   │   ├── custom.css
+│   │   ├── auth.css
+│   │   └── pages.css
+│   ├── js/
+│   │   ├── main.js
+│   │   ├── cotizaciones.js      # Gráficos y lógica del dashboard económico
+│   │   ├── cuentas_corrientes.js# Edición inline y lógica de la tabla CC
+│   │   ├── auth.js
+│   │   └── password-validation.js
 │   └── robots.txt
 │
 └── media/                       # Archivos subidos por usuarios
@@ -202,6 +229,65 @@ Estudio/
 - Al menos un número
 - Sin contraseñas comunes
 
+### Dashboard Económico
+
+Accesible para roles **Administrador** y **Colaborador** en `/cotizaciones/`.
+
+Muestra en tiempo real datos obtenidos de APIs públicas argentinas:
+
+| Fuente | Datos |
+|---|---|
+| [dolarapi.com](https://dolarapi.com) | Cotizaciones del dólar (oficial, blue, MEP, CCL, cripto, etc.) y otras divisas |
+| [argentinadatos.com](https://api.argentinadatos.com) | Inflación mensual e interanual, índice UVA, riesgo país |
+
+**Componentes del dashboard:**
+- Cards resumen: cotizaciones del dólar por tipo, última inflación mensual e interanual, último UVA, riesgo país
+- Gráfico de inflación mensual (últimos 24 meses, Chart.js)
+- Gráfico de inflación interanual (últimos 24 meses, Chart.js)
+- Gráfico de evolución del UVA (últimos 60 meses, Chart.js)
+- Gráfico de riesgo país (últimos 60 meses, Chart.js)
+
+Si una API no responde, el sistema no falla: devuelve una lista vacía y registra el error en el log.
+
+### Cuentas Corrientes
+
+Accesible para roles **Administrador** y **Colaborador** en `/cuentas-corrientes/`.
+
+Módulo de seguimiento de deudas periódicas de clientes, con estructura de hasta 5 columnas mensuales configurables.
+
+#### Modelos
+
+| Modelo | Descripción |
+|---|---|
+| `ClienteCC` | Cliente con nombre único, campo `vencido` (deuda acumulada histórica), `balance_especial` (editable manualmente) y propiedad calculada `saldo` |
+| `MesCC` | Registro mensual de un cliente: `periodo` (día 1 del mes) y `monto`. Restricción única `(cliente, periodo)` |
+| `ConfiguracionMeses` | Define los 5 periodos activos visibles en la tabla. Orden 1 = más antiguo, 5 = más reciente |
+
+#### Funcionalidades
+
+**Lista (`/cuentas-corrientes/`)**
+- Tabla paginada (50 por página) de clientes activos con columnas: Vencido, Balance/Especial y los 5 meses activos
+- Saldo total calculado dinámicamente
+- Búsqueda por nombre
+- Ordenamiento por nombre (defecto) o por saldo (ascendente / descendente)
+- Fila de totales por columna al pie
+- Edición inline por fila vía AJAX (sin recargar la página)
+- Exportar a Excel con formato estilag (.xlsx)
+
+**Nuevo Mes (`/cuentas-corrientes/nuevo-mes/`)**  
+Carga una facturación mensual desde un archivo `.xlsx` (dos columnas: Nombre, Monto).
+
+- **Escenario 1 — Primera carga del mes:** desplaza la ventana de 5 meses: acumula el mes más antiguo en `vencido`, lo elimina y crea la nueva columna con los montos del Excel
+- **Escenario 2 — Carga adicional del mismo mes:** suma los montos al periodo ya existente sin rotar columnas
+- Crea automáticamente clientes nuevos si el nombre no existe
+- Valida que el proceso solo pueda ejecutarse durante el mes calendario correspondiente
+
+**Importar (`/cuentas-corrientes/importar/`) — Solo Administrador + staff**  
+Importación masiva inicial desde un `.xlsx` con el mismo formato que la exportación:
+`Cliente | Saldo (ignorado) | Vencido | Balance/Especial | Mes1 | ... | MesN`
+- Crea o actualiza clientes y registros de meses
+- Configura automáticamente los periodos en `ConfiguracionMeses`
+
 ### Seguridad (producción)
 - `HTTPS` forzado con redirección SSL
 - `HSTS` con 1 año, subdomains y preload
@@ -216,13 +302,20 @@ Estudio/
 
 | URL | Nombre | Acceso |
 |---|---|---|
-| `/` | `home` | Requiere login |
+| `/` | — | Redirige a `/login/` |
 | `/login/` | `login` | Público |
 | `/logout/` | `logout` | Autenticado |
+| `/dashboard/` | `dashboard` | Requiere login |
 | `/perfil/` | `perfil` | Requiere login |
 | `/activate/<token>/` | `activate` | Enlace por email |
 | `/password-reset/` | `password_reset` | Público |
 | `/password-reset-confirm/<token>/` | `password_reset_confirm` | Enlace por email |
+| `/cotizaciones/` | `cotizaciones:dashboard_economico` | Administrador / Colaborador |
+| `/cuentas-corrientes/` | `cuentas_corrientes:lista` | Administrador / Colaborador |
+| `/cuentas-corrientes/editar/` | `cuentas_corrientes:editar_fila` | Administrador / Colaborador |
+| `/cuentas-corrientes/nuevo-mes/` | `cuentas_corrientes:nuevo_mes` | Administrador / Colaborador |
+| `/cuentas-corrientes/exportar/` | `cuentas_corrientes:exportar` | Administrador / Colaborador |
+| `/cuentas-corrientes/importar/` | `cuentas_corrientes:importar` | Administrador (staff) |
 | `/admin/` | — | Staff (`is_staff=True`) |
 | `/robots.txt` | — | Público |
 
