@@ -92,6 +92,9 @@
                 <a href="{% url 'cotizaciones:dashboard_economico' %}" class="nav-studio-item {% if request.resolver_match.app_name == 'cotizaciones' %}active{% endif %}">
                     <i class="bi bi-graph-up-arrow"></i> Cotizaciones
                 </a>
+                <a href="{% url 'cuentas_corrientes:lista' %}" class="nav-studio-item {% if request.resolver_match.app_name == 'cuentas_corrientes' %}active{% endif %}">
+                    <i class="bi bi-table"></i> Cuentas Corrientes
+                </a>
                 {% endif %}
                 {% if user.rol == 'Administrador' %}
                 <a href="/admin/" class="nav-studio-item">

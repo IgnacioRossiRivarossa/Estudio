@@ -16,6 +16,7 @@ urlpatterns = [
     path('', RedirectView.as_view(url='/login/', permanent=False), name='home'),
     path('dashboard/', home_view, name='dashboard'),
     path('cotizaciones/', include('cotizaciones.urls')),
+    path('cuentas-corrientes/', include('cuentas_corrientes.urls')),
     path('robots.txt', RedirectView.as_view(url='/static/robots.txt', permanent=True)),
 ]
 

@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Importar Cuentas Corrientes - Estudio Rivarossa{% endblock %}
+
+{% block content %}
+<div class="container-studio py-4">
+    <!-- Encabezado -->
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h2 class="page-heading">
+                <i class="bi bi-cloud-arrow-up text-purple"></i> Importar Cuentas Corrientes
+            </h2>
+            <p class="page-subtitle mb-0">
+                Carga masiva inicial desde archivo Excel
+            </p>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'cuentas_corrientes:lista' %}" class="btn-studio btn-studio-ghost">
+                <i class="bi bi-arrow-left"></i> Volver a la lista
+            </a>
+        </div>
+    </div>
+
+    <!-- Información sobre el formato -->
+    <div class="card-studio mb-4">
+        <h5 class="card-studio-title mb-3">
+            <i class="bi bi-info-circle"></i> Formato del archivo
+        </h5>
+        <p class="mb-2">
+            El archivo debe ser <strong>.xlsx</strong> con el mismo formato que la tabla de cuentas corrientes:
+        </p>
+        <div class="table-responsive mb-3">
+            <table class="table table-sm table-bordered mb-0" style="font-size: 0.85rem;">
+                <thead>
+                    <tr style="background: var(--color-purple-alpha-10);">
+                        <th>Cliente</th>
+                        <th>Saldo</th>
+                        <th>Vencido</th>
+                        <th>Balance/Especial</th>
+                        <th>Ene-25</th>
+                        <th>Feb-25</th>
+                        <th>...</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Nombre del cliente</td>
+                        <td class="text-muted"><em>Se ignora</em></td>
+                        <td>1500.00</td>
+                        <td>200.00</td>
+                        <td>300.00</td>
+                        <td>450.00</td>
+                        <td>...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <ul class="mb-0 small">
+            <li>La <strong>primera fila</strong> se interpreta como encabezado y se omite.</li>
+            <li>La columna <strong>Saldo</strong> se ignora ya que es un valor calculado.</li>
+            <li>Las columnas de meses deben tener formato <strong>Mes-Año</strong> (ej: Ene-25, Feb-25, Mar-25).</li>
+            <li>Si los periodos no existen en la configuración, se crearán automáticamente.</li>
+            <li>Si un cliente ya existe, se <strong>actualizarán</strong> sus valores.</li>
+            <li>Puede usar el archivo generado por <strong>"Exportar a Excel"</strong> como plantilla.</li>
+        </ul>
+    </div>
+
+    <!-- Aviso de operación crítica -->
+    <div class="alert alert-warning mb-4">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <strong>Atención:</strong> Esta funcionalidad está diseñada para la importación inicial de datos.
+        Los clientes existentes serán actualizados con los valores del archivo.
+        Asegúrese de que los datos sean correctos antes de proceder.
+    </div>
+
+    <!-- Formulario de carga -->
+    <div class="card-studio mb-4">
+        <h5 class="card-studio-title mb-3">
+            <i class="bi bi-upload"></i> Subir archivo Excel
+        </h5>
+        <form method="post" enctype="multipart/form-data" action="{% url 'cuentas_corrientes:importar' %}">
+            {% csrf_token %}
+            <div class="row g-3 align-items-end">
+                <div class="col-12 col-md-6">
+                    <label for="archivo" class="form-label fw-semibold">Archivo Excel (.xlsx)</label>
+                    <input type="file" class="form-control" id="archivo" name="archivo"
+                           accept=".xlsx" required>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn-studio btn-studio-primary"
+                            onclick="return confirm('¿Está seguro de importar este archivo? Los clientes existentes serán actualizados con los valores del Excel.')">
+                        <i class="bi bi-cloud-arrow-up"></i> Importar datos
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Resultado del procesamiento -->
+    {% if resultado %}
+    <div class="card-studio">
+        {% if resultado.error %}
+        <div class="alert alert-danger mb-0">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Error:</strong> {{ resultado.error }}
+        </div>
+        {% elif resultado.ok %}
+        <h5 class="card-studio-title mb-3 text-success">
+            <i class="bi bi-check-circle-fill"></i> Importación completada exitosamente
+        </h5>
+        <div class="row g-3 mb-3">
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="p-3 rounded" style="background: var(--bg-secondary);">
+                    <div class="text-muted small">Total procesados</div>
+                    <div class="fw-bold fs-5">{{ resultado.total_procesados }}</div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="p-3 rounded" style="background: var(--bg-secondary);">
+                    <div class="text-muted small">Clientes creados</div>
+                    <div class="fw-bold fs-5 text-success">{{ resultado.clientes_creados }}</div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="p-3 rounded" style="background: var(--bg-secondary);">
+                    <div class="text-muted small">Clientes actualizados</div>
+                    <div class="fw-bold fs-5" style="color: var(--color-purple-primary);">{{ resultado.clientes_actualizados }}</div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="p-3 rounded" style="background: var(--bg-secondary);">
+                    <div class="text-muted small">Registros de meses</div>
+                    <div class="fw-bold fs-5">{{ resultado.meses_creados }}</div>
+                </div>
+            </div>
+        </div>
+
+        {% if resultado.periodos_configurados > 0 %}
+        <div class="alert alert-info">
+            <i class="bi bi-calendar-check me-2"></i>
+            Se configuraron <strong>{{ resultado.periodos_configurados }}</strong> periodo{{ resultado.periodos_configurados|pluralize:"s" }} nuevo{{ resultado.periodos_configurados|pluralize:"s" }} automáticamente.
+        </div>
+        {% endif %}
+
+        {% if resultado.errores_formato %}
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-circle me-2"></i>
+            <strong>Advertencias ({{ resultado.errores_formato|length }}):</strong>
+            <ul class="mb-0 mt-2">
+                {% for err in resultado.errores_formato %}
+                <li>{{ err }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <div class="mt-3">
+            <a href="{% url 'cuentas_corrientes:lista' %}" class="btn-studio btn-studio-primary">
+                <i class="bi bi-table"></i> Ver Cuentas Corrientes
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

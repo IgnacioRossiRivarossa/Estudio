@@ -26,6 +26,7 @@ LOCAL_APPS = [
     'usuarios.apps.UsuariosConfig',
     'clientes.apps.ClientesConfig',
     'cotizaciones.apps.CotizacionesConfig',
+    'cuentas_corrientes.apps.CuentasCorrientesConfig',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS

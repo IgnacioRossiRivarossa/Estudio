@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+{% load static %}
+{% load cc_tags %}
+
+{% block title %}Cuentas Corrientes - Estudio Rivarossa{% endblock %}
+
+{% block extra_css %}
+<style>
+    .table-cc {
+        font-size: 0.875rem;
+    }
+    .table-cc thead th {
+        background: var(--color-purple-primary);
+        color: var(--text-inverse);
+        text-align: center;
+        vertical-align: middle;
+        white-space: nowrap;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        border: 1px solid var(--color-purple-active);
+        padding: 0.6rem 0.75rem;
+    }
+    .table-cc tbody td {
+        text-align: center;
+        vertical-align: middle;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--border-color);
+    }
+    .table-cc tbody tr:hover {
+        background: var(--color-purple-alpha-10);
+    }
+    .table-cc tbody td:first-child {
+        text-align: left;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+    .table-cc .cell-input {
+        width: 100%;
+        max-width: 120px;
+        text-align: right;
+        padding: 0.25rem 0.5rem;
+        border: 1px solid var(--border-focus);
+        border-radius: 4px;
+        font-size: 0.875rem;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+    }
+    .table-cc .cell-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--color-purple-alpha-30);
+    }
+    .saldo-col {
+        font-weight: 700;
+        color: var(--color-purple-primary);
+    }
+    .btn-edit-row, .btn-save-row, .btn-cancel-row {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.78rem;
+    }
+    .sort-link {
+        color: var(--text-inverse);
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .sort-link:hover {
+        color: var(--color-gray-lighter);
+    }
+    .table-responsive-cc {
+        overflow-x: auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-studio py-4">
+    <!-- Encabezado -->
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h2 class="page-heading">
+                <i class="bi bi-table text-purple"></i> Cuentas Corrientes
+            </h2>
+            <p class="page-subtitle mb-0">
+                Estado de cuenta corriente de clientes
+            </p>
+        </div>
+        <div class="col-auto d-flex align-items-center gap-2 flex-wrap">
+            {% if user.rol == 'Administrador' and user.is_staff %}
+            <a href="{% url 'cuentas_corrientes:importar' %}"
+               class="btn-studio btn-studio-secondary">
+                <i class="bi bi-cloud-arrow-up"></i> Importar Excel
+            </a>
+            {% endif %}
+            <a href="{% url 'cuentas_corrientes:exportar' %}?busqueda={{ busqueda }}&orden={{ orden }}"
+               class="btn-studio btn-studio-secondary">
+                <i class="bi bi-file-earmark-excel"></i> Exportar a Excel
+            </a>
+            <a href="{% url 'cuentas_corrientes:nuevo_mes' %}" class="btn-studio btn-studio-primary">
+                <i class="bi bi-calendar-plus"></i> Nuevo Mes
+            </a>
+        </div>
+    </div>
+
+    <!-- Barra de búsqueda y orden -->
+    <div class="card-studio mb-4">
+        <form method="get" action="{% url 'cuentas_corrientes:lista' %}" class="row g-3 align-items-end">
+            <div class="col-12 col-md-6 col-lg-4">
+                <label for="busqueda" class="form-label fw-semibold">Buscar cliente</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" id="busqueda" name="busqueda"
+                           value="{{ busqueda }}" placeholder="Nombre del cliente...">
+                </div>
+            </div>
+            <div class="col-auto">
+                <input type="hidden" name="orden" value="{{ orden }}">
+                <button type="submit" class="btn-studio btn-studio-primary">
+                    <i class="bi bi-funnel"></i> Filtrar
+                </button>
+            </div>
+            {% if busqueda %}
+            <div class="col-auto">
+                <a href="{% url 'cuentas_corrientes:lista' %}" class="btn-studio btn-studio-ghost">
+                    <i class="bi bi-x-circle"></i> Limpiar
+                </a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Tabla -->
+    <div class="card-studio p-0">
+        <div class="table-responsive-cc">
+            <table class="table table-cc mb-0" id="tabla-cc">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>
+                            {% if orden == 'saldo_asc' %}
+                            <a href="?busqueda={{ busqueda }}&orden=saldo_desc" class="sort-link">
+                                Saldo <i class="bi bi-sort-down"></i>
+                            </a>
+                            {% elif orden == 'saldo_desc' %}
+                            <a href="?busqueda={{ busqueda }}&orden=saldo_asc" class="sort-link">
+                                Saldo <i class="bi bi-sort-up"></i>
+                            </a>
+                            {% else %}
+                            <a href="?busqueda={{ busqueda }}&orden=saldo_asc" class="sort-link">
+                                Saldo <i class="bi bi-arrow-down-up"></i>
+                            </a>
+                            {% endif %}
+                        </th>
+                        <th>Vencido</th>
+                        <th>Balance/Especial</th>
+                        {% for enc in encabezados_meses %}
+                        <th>{{ enc }}</th>
+                        {% endfor %}
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fila in filas %}
+                    <tr data-cliente-id="{{ fila.cliente.pk }}">
+                        <td>{{ fila.cliente.nombre }}</td>
+                        <td class="saldo-col" data-field="saldo">{{ fila.saldo|formato_ar }}</td>
+                        <td data-field="vencido" data-value="{{ fila.vencido }}">{{ fila.vencido|formato_ar }}</td>
+                        <td data-field="balance_especial" data-value="{{ fila.balance_especial }}">{{ fila.balance_especial|formato_ar }}</td>
+                        {% for mes in fila.meses %}
+                        <td data-field="mes" data-periodo="{{ mes.periodo }}" data-value="{{ mes.monto }}">
+                            {{ mes.monto|formato_ar }}
+                        </td>
+                        {% endfor %}
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-primary btn-edit-row"
+                                    onclick="habilitarEdicion(this)" title="Editar">
+                                <i class="bi bi-pencil"></i> Editar
+                            </button>
+                            <button type="button" class="btn btn-sm btn-success btn-save-row d-none"
+                                    onclick="guardarFila(this)" title="Guardar">
+                                <i class="bi bi-check-lg"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary btn-cancel-row d-none"
+                                    onclick="cancelarEdicion(this)" title="Cancelar">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="{{ encabezados_meses|length|add:5 }}" class="text-center py-4 text-muted">
+                            <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                            No se encontraron cuentas corrientes.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                {% if filas %}
+                <tfoot>
+                    <tr>
+                        <td></td>
+                        <td class="saldo-col" data-total="saldo"><strong>{{ totales.saldo|formato_ar }}</strong></td>
+                        <td data-total="vencido"><strong>{{ totales.vencido|formato_ar }}</strong></td>
+                        <td data-total="balance_especial"><strong>{{ totales.balance_especial|formato_ar }}</strong></td>
+                        {% for total_mes in totales.meses %}
+                        <td data-total="mes-{{ forloop.counter0 }}"><strong>{{ total_mes|formato_ar }}</strong></td>
+                        {% endfor %}
+                        <td></td>
+                    </tr>
+                </tfoot>
+                {% endif %}
+            </table>
+        </div>
+    </div>
+
+    <!-- Paginación -->
+    {% if page_obj.has_other_pages %}
+    <nav class="mt-4 d-flex justify-content-center" aria-label="Paginación">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&busqueda={{ busqueda }}&orden={{ orden }}">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}&busqueda={{ busqueda }}&orden={{ orden }}">{{ num }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}&busqueda={{ busqueda }}&orden={{ orden }}">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const editarFilaUrl = "{% url 'cuentas_corrientes:editar_fila' %}";
+    const csrfToken = "{{ csrf_token }}";
+</script>
+<script src="{% static 'js/cuentas_corrientes.js' %}?v=1.0"></script>
+{% endblock %}

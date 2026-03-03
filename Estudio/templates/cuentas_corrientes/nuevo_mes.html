@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Nuevo Mes - Cuentas Corrientes - Estudio Rivarossa{% endblock %}
+
+{% block content %}
+<div class="container-studio py-4">
+    <!-- Encabezado -->
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h2 class="page-heading">
+                <i class="bi bi-calendar-plus text-purple"></i> Nuevo Mes
+            </h2>
+            <p class="page-subtitle mb-0">
+                Importar archivo Excel para cierre y apertura de mes
+            </p>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'cuentas_corrientes:lista' %}" class="btn-studio btn-studio-ghost">
+                <i class="bi bi-arrow-left"></i> Volver a la lista
+            </a>
+        </div>
+    </div>
+
+    <!-- Formulario de carga -->
+    <div class="card-studio mb-4">
+        <h5 class="card-studio-title mb-3">
+            <i class="bi bi-upload"></i> Subir archivo Excel
+        </h5>
+        <p class="mb-3">
+            El archivo debe ser <strong>.xlsx</strong> con dos columnas:<br>
+            <strong>Columna A:</strong> Nombre del cliente &nbsp;|&nbsp;
+            <strong>Columna B:</strong> Monto del nuevo mes<br>
+            <small>La primera fila se considera encabezado y se omite.</small>
+        </p>
+        <form method="post" enctype="multipart/form-data" action="{% url 'cuentas_corrientes:nuevo_mes' %}">
+            {% csrf_token %}
+            <div class="row g-3 align-items-end">
+                <div class="col-12 col-md-6">
+                    <label for="archivo" class="form-label fw-semibold">Archivo Excel (.xlsx)</label>
+                    <input type="file" class="form-control" id="archivo" name="archivo"
+                           accept=".xlsx" required>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn-studio btn-studio-primary"
+                            onclick="return confirm('¿Está seguro de ejecutar el proceso de Nuevo Mes? Esta acción cerrará el mes más antiguo y abrirá uno nuevo.')">
+                        <i class="bi bi-play-circle"></i> Procesar Nuevo Mes
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Resultado del procesamiento -->
+    {% if resultado %}
+    <div class="card-studio">
+        {% if resultado.error %}
+        <div class="alert alert-danger mb-0">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Error:</strong> {{ resultado.error }}
+        </div>
+        {% elif resultado.ok %}
+
+        {% if resultado.modo == 'creacion' %}
+        <h5 class="card-studio-title mb-3 text-success">
+            <i class="bi bi-check-circle-fill"></i> Nuevo mes creado exitosamente
+        </h5>
+        <div class="row g-3 mb-3">
+            <div class="col-12 col-md-4">
+                <div class="p-3 rounded" style="background: var(--bg-secondary);">
+                    <div class="text-muted small">Periodo cerrado</div>
+                    <div class="fw-bold fs-5">{{ resultado.periodo_cerrado }}</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="p-3 rounded" style="background: var(--bg-secondary);">
+                    <div class="text-muted small">Nuevo periodo abierto</div>
+                    <div class="fw-bold fs-5">{{ resultado.periodo_nuevo }}</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="p-3 rounded" style="background: var(--bg-secondary);">
+                    <div class="text-muted small">Clientes procesados</div>
+                    <div class="fw-bold fs-5">{{ resultado.procesados }}</div>
+                </div>
+            </div>
+        </div>
+
+        {% elif resultado.modo == 'actualizacion' %}
+        <h5 class="card-studio-title mb-3 text-success">
+            <i class="bi bi-check-circle-fill"></i> Facturación agregada al mes existente
+        </h5>
+        <div class="row g-3 mb-3">
+            <div class="col-12 col-md-6">
+                <div class="p-3 rounded" style="background: var(--bg-secondary);">
+                    <div class="text-muted small">Periodo actualizado</div>
+                    <div class="fw-bold fs-5">{{ resultado.periodo_actualizado }}</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="p-3 rounded" style="background: var(--bg-secondary);">
+                    <div class="text-muted small">Clientes procesados</div>
+                    <div class="fw-bold fs-5">{{ resultado.procesados }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="alert alert-info mb-3">
+            <i class="bi bi-info-circle me-2"></i>
+            Los montos del Excel se <strong>sumaron</strong> a los valores existentes en la columna {{ resultado.periodo_actualizado }}.
+        </div>
+        {% endif %}
+
+        {% if resultado.clientes_creados > 0 %}
+        <div class="alert alert-info">
+            <i class="bi bi-person-plus me-2"></i>
+            Se crearon <strong>{{ resultado.clientes_creados }}</strong> cliente{{ resultado.clientes_creados|pluralize:"s" }} nuevo{{ resultado.clientes_creados|pluralize:"s" }} automáticamente.
+        </div>
+        {% endif %}
+
+        {% if resultado.errores_formato %}
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-circle me-2"></i>
+            <strong>Advertencias ({{ resultado.errores_formato|length }}):</strong>
+            <ul class="mb-0 mt-2">
+                {% for err in resultado.errores_formato %}
+                <li>{{ err }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <a href="{% url 'cuentas_corrientes:lista' %}" class="btn-studio btn-studio-primary mt-2">
+            <i class="bi bi-table"></i> Ver tabla actualizada
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
