@@ -6,6 +6,7 @@
 
 {% block extra_css %}
 <style>
+    /* ── Tabla CC ── */
     .table-cc {
         font-size: 0.875rem;
     }
@@ -68,6 +69,108 @@
     }
     .table-responsive-cc {
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* ── Dashboard KPI ── */
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 0.5rem;
+    }
+    .kpi-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md, 8px);
+        padding: 0.6rem 0.5rem;
+        text-align: center;
+        transition: var(--transition-all, all 0.2s);
+        overflow: hidden;
+        min-width: 0;          /* allow flex/grid shrink */
+    }
+    .kpi-card:hover {
+        box-shadow: var(--shadow-sm);
+        border-color: var(--color-purple-alpha-30);
+    }
+    .kpi-label {
+        font-size: 0.68rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: var(--text-tertiary);
+        margin-bottom: 0.2rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .kpi-value-ars {
+        font-size: clamp(0.72rem, 1.6vw, 1rem);
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1.3;
+        word-break: break-all;
+        overflow-wrap: anywhere;
+    }
+    .kpi-value-usd {
+        font-size: clamp(0.62rem, 1.2vw, 0.78rem);
+        font-weight: 500;
+        color: var(--color-purple-primary);
+        line-height: 1.3;
+        word-break: break-all;
+        overflow-wrap: anywhere;
+    }
+    .kpi-empty {
+        font-size: 0.85rem;
+        color: var(--text-tertiary);
+    }
+    .kpi-tag-static {
+        font-size: 0.62rem;
+        color: var(--text-tertiary);
+        font-style: italic;
+    }
+    .dashboard-header {
+        font-size: 0.85rem;
+    }
+
+    /* ── Responsive: Dashboard grid ── */
+    @media (max-width: 1399.98px) {
+        .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 991.98px) {
+        .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 767.98px) {
+        .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+        .kpi-value-ars { font-size: 0.82rem; }
+        .kpi-value-usd { font-size: 0.68rem; }
+    }
+    @media (max-width: 575.98px) {
+        .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 0.4rem; }
+        .kpi-card { padding: 0.5rem 0.4rem; }
+        .kpi-label { font-size: 0.6rem; }
+    }
+
+    /* ── Responsive: Header buttons ── */
+    @media (max-width: 767.98px) {
+        .cc-header-row {
+            flex-direction: column;
+            align-items: flex-start !important;
+        }
+        .cc-header-row .col-auto {
+            width: 100%;
+        }
+        .cc-header-actions {
+            justify-content: flex-start !important;
+            width: 100%;
+        }
+    }
+
+    /* ── Responsive: Table ── */
+    @media (max-width: 767.98px) {
+        .table-cc { font-size: 0.78rem; }
+        .table-cc thead th { padding: 0.4rem 0.5rem; font-size: 0.75rem; }
+        .table-cc tbody td { padding: 0.35rem 0.5rem; }
+        .btn-edit-row, .btn-save-row, .btn-cancel-row { font-size: 0.7rem; padding: 0.2rem 0.4rem; }
     }
 </style>
 {% endblock %}
@@ -75,7 +178,7 @@
 {% block content %}
 <div class="container-studio py-4">
     <!-- Encabezado -->
-    <div class="row mb-4 align-items-center">
+    <div class="row mb-4 align-items-center cc-header-row">
         <div class="col">
             <h2 class="page-heading">
                 <i class="bi bi-table text-purple"></i> Cuentas Corrientes
@@ -84,7 +187,7 @@
                 Estado de cuenta corriente de clientes
             </p>
         </div>
-        <div class="col-auto d-flex align-items-center gap-2 flex-wrap">
+        <div class="col-auto d-flex align-items-center gap-2 flex-wrap cc-header-actions">
             {% if user.rol == 'Administrador' and user.is_staff %}
             <a href="{% url 'cuentas_corrientes:importar' %}"
                class="btn-studio btn-studio-secondary">
@@ -101,31 +204,95 @@
         </div>
     </div>
 
-    <!-- Barra de búsqueda y orden -->
-    <div class="card-studio mb-4">
-        <form method="get" action="{% url 'cuentas_corrientes:lista' %}" class="row g-3 align-items-end">
-            <div class="col-12 col-md-6 col-lg-4">
-                <label for="busqueda" class="form-label fw-semibold">Buscar cliente</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" class="form-control" id="busqueda" name="busqueda"
-                           value="{{ busqueda }}" placeholder="Nombre del cliente...">
+    <!-- Barra de búsqueda + Tablero de control -->
+    <div class="row mb-4 g-3">
+        <!-- Búsqueda y filtro -->
+        <div class="col-12 col-lg-4">
+            <div class="card-studio h-100">
+                <form method="get" action="{% url 'cuentas_corrientes:lista' %}">
+                    <label for="busqueda" class="form-label fw-semibold">Buscar cliente</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="busqueda" name="busqueda"
+                               value="{{ busqueda }}" placeholder="Nombre del cliente...">
+                    </div>
+                    <input type="hidden" name="orden" value="{{ orden }}">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button type="submit" class="btn-studio btn-studio-primary">
+                            <i class="bi bi-funnel"></i> Filtrar
+                        </button>
+                        {% if busqueda or orden %}
+                        <a href="{% url 'cuentas_corrientes:lista' %}" class="btn-studio btn-studio-ghost">
+                            <i class="bi bi-x-circle"></i> Limpiar filtro
+                        </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- Tablero de control -->
+        <div class="col-12 col-lg-8">
+            <div class="card-studio h-100">
+                <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-1">
+                    <span class="fw-semibold dashboard-header">
+                        <i class="bi bi-speedometer2 text-purple"></i> Tablero de Control
+                    </span>
+                    {% if dashboard.dolar_venta %}
+                    <span class="badge-studio badge-studio-purple" style="font-size:0.7rem;">
+                        USD Oficial: ${{ dashboard.dolar_venta|formato_ar }}
+                    </span>
+                    {% endif %}
+                </div>
+                <div class="kpi-grid">
+                    <!-- Saldo total -->
+                    <div class="kpi-card">
+                        <div class="kpi-label">Saldo Total</div>
+                        <div class="kpi-value-ars" id="kpi-saldo-ars">{{ dashboard.total_saldo|formato_ar }}</div>
+                        <div class="kpi-value-usd" id="kpi-saldo-usd">
+                            {% if dashboard.total_saldo_usd != None %}
+                            USD {{ dashboard.total_saldo_usd|formato_ar }}
+                            {% else %}—{% endif %}
+                        </div>
+                    </div>
+                    <!-- Vencido total -->
+                    <div class="kpi-card">
+                        <div class="kpi-label">Vencido</div>
+                        <div class="kpi-value-ars" id="kpi-vencido-ars">{{ dashboard.total_vencido|formato_ar }}</div>
+                        <div class="kpi-value-usd" id="kpi-vencido-usd">
+                            {% if dashboard.total_vencido_usd != None %}
+                            USD {{ dashboard.total_vencido_usd|formato_ar }}
+                            {% else %}—{% endif %}
+                        </div>
+                    </div>
+                    <!-- Balance/Especial total -->
+                    <div class="kpi-card">
+                        <div class="kpi-label">Balance/Especial</div>
+                        <div class="kpi-value-ars" id="kpi-balance-ars">{{ dashboard.total_balance|formato_ar }}</div>
+                        <div class="kpi-value-usd" id="kpi-balance-usd">
+                            {% if dashboard.total_balance_usd != None %}
+                            USD {{ dashboard.total_balance_usd|formato_ar }}
+                            {% else %}—{% endif %}
+                        </div>
+                    </div>
+                    <!-- Facturación estática del último mes -->
+                    <div class="kpi-card">
+                        <div class="kpi-label">Fact. {{ dashboard.periodo_facturacion }}</div>
+                        <div class="kpi-value-ars">{{ dashboard.sumatoria_facturacion|formato_ar }}</div>
+                        <div class="kpi-tag-static">estático</div>
+                    </div>
+                    <!-- Ciclo de cobro -->
+                    <div class="kpi-card">
+                        <div class="kpi-label">Ciclo de Cobro</div>
+                        <div class="kpi-empty">—</div>
+                    </div>
+                    <!-- % Morosidad -->
+                    <div class="kpi-card">
+                        <div class="kpi-label">% Morosidad</div>
+                        <div class="kpi-empty">—</div>
+                    </div>
                 </div>
             </div>
-            <div class="col-auto">
-                <input type="hidden" name="orden" value="{{ orden }}">
-                <button type="submit" class="btn-studio btn-studio-primary">
-                    <i class="bi bi-funnel"></i> Filtrar
-                </button>
-            </div>
-            {% if busqueda %}
-            <div class="col-auto">
-                <a href="{% url 'cuentas_corrientes:lista' %}" class="btn-studio btn-studio-ghost">
-                    <i class="bi bi-x-circle"></i> Limpiar
-                </a>
-            </div>
-            {% endif %}
-        </form>
+        </div>
     </div>
 
     <!-- Tabla -->
@@ -150,10 +317,54 @@
                             </a>
                             {% endif %}
                         </th>
-                        <th>Vencido</th>
-                        <th>Balance/Especial</th>
+                        <th>
+                            {% if orden == 'vencido_asc' %}
+                            <a href="?busqueda={{ busqueda }}&orden=vencido_desc" class="sort-link">
+                                Vencido <i class="bi bi-sort-down"></i>
+                            </a>
+                            {% elif orden == 'vencido_desc' %}
+                            <a href="?busqueda={{ busqueda }}&orden=vencido_asc" class="sort-link">
+                                Vencido <i class="bi bi-sort-up"></i>
+                            </a>
+                            {% else %}
+                            <a href="?busqueda={{ busqueda }}&orden=vencido_asc" class="sort-link">
+                                Vencido <i class="bi bi-arrow-down-up"></i>
+                            </a>
+                            {% endif %}
+                        </th>
+                        <th>
+                            {% if orden == 'balance_asc' %}
+                            <a href="?busqueda={{ busqueda }}&orden=balance_desc" class="sort-link">
+                                Balance/Especial <i class="bi bi-sort-down"></i>
+                            </a>
+                            {% elif orden == 'balance_desc' %}
+                            <a href="?busqueda={{ busqueda }}&orden=balance_asc" class="sort-link">
+                                Balance/Especial <i class="bi bi-sort-up"></i>
+                            </a>
+                            {% else %}
+                            <a href="?busqueda={{ busqueda }}&orden=balance_asc" class="sort-link">
+                                Balance/Especial <i class="bi bi-arrow-down-up"></i>
+                            </a>
+                            {% endif %}
+                        </th>
                         {% for enc in encabezados_meses %}
-                        <th>{{ enc }}</th>
+                        <th>
+                            {% sort_key_mes forloop.counter0 "asc" as sk_asc %}
+                            {% sort_key_mes forloop.counter0 "desc" as sk_desc %}
+                            {% if orden == sk_asc %}
+                            <a href="?busqueda={{ busqueda }}&orden={{ sk_desc }}" class="sort-link">
+                                {{ enc }} <i class="bi bi-sort-down"></i>
+                            </a>
+                            {% elif orden == sk_desc %}
+                            <a href="?busqueda={{ busqueda }}&orden={{ sk_asc }}" class="sort-link">
+                                {{ enc }} <i class="bi bi-sort-up"></i>
+                            </a>
+                            {% else %}
+                            <a href="?busqueda={{ busqueda }}&orden={{ sk_asc }}" class="sort-link">
+                                {{ enc }} <i class="bi bi-arrow-down-up"></i>
+                            </a>
+                            {% endif %}
+                        </th>
                         {% endfor %}
                         <th>Acciones</th>
                     </tr>
@@ -249,6 +460,7 @@
 <script>
     const editarFilaUrl = "{% url 'cuentas_corrientes:editar_fila' %}";
     const csrfToken = "{{ csrf_token }}";
+    const dolarVenta = {{ dashboard.dolar_venta|default:"0" }};
 </script>
-<script src="{% static 'js/cuentas_corrientes.js' %}?v=1.0"></script>
+<script src="{% static 'js/cuentas_corrientes.js' %}?v=2.0"></script>
 {% endblock %}

@@ -20,5 +20,5 @@ class MesCCAdmin(admin.ModelAdmin):
 
 @admin.register(ConfiguracionMeses)
 class ConfiguracionMesesAdmin(admin.ModelAdmin):
-    list_display = ('orden', 'periodo')
+    list_display = ('orden', 'periodo', 'sumatoria_facturacion')
     ordering = ('orden',)

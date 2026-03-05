@@ -88,6 +88,13 @@ class ConfiguracionMeses(models.Model):
         unique=True,
         help_text='Periodo activo. Siempre guardar el día 1 del mes.',
     )
+    sumatoria_facturacion = models.DecimalField(
+        'sumatoria facturación',
+        max_digits=15,
+        decimal_places=2,
+        default=Decimal('0.00'),
+        help_text='Sumatoria total de la columna al momento de crear el mes. Valor estático.',
+    )
 
     class Meta:
         verbose_name = 'Configuración de Mes'

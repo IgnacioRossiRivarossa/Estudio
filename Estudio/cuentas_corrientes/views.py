@@ -33,11 +33,6 @@ def _get_periodos_activos():
     return list(ConfiguracionMeses.objects.order_by('orden').values_list('periodo', flat=True))
 
 def _limpiar_meses_inactivos():
-    """
-    Acumula en 'vencido' el monto de todos los MesCC cuyo periodo no esté en
-    ConfiguracionMeses y luego los elimina.
-    Debe ejecutarse dentro de una transacción atómica.
-    """
     periodos_vigentes = list(ConfiguracionMeses.objects.values_list('periodo', flat=True))
     sumas = (
         MesCC.objects
@@ -53,6 +48,19 @@ def _limpiar_meses_inactivos():
 
 def _formato_periodo(periodo):
     return f'{MESES_ES.get(periodo.month, "?")}-{str(periodo.year)[2:]}'
+
+def _get_dolar_oficial_venta():
+    try:
+        from cotizaciones.services import get_dolares
+        dolares = get_dolares()
+        for d in dolares:
+            if d.get('casa') == 'oficial':
+                venta = d.get('venta')
+                if venta is not None:
+                    return Decimal(str(venta))
+    except Exception:
+        logger.warning('No se pudo obtener el dólar oficial.')
+    return None
 
 def _build_tabla(clientes, periodos_activos):
     filas = []
@@ -94,6 +102,7 @@ def lista_cuentas(request):
         clientes = clientes.filter(nombre__icontains=busqueda)
 
     # Anotar suma de meses activos para poder ordenar por saldo en DB
+    anotaciones_meses = {}
     if periodos_activos:
         clientes = clientes.annotate(
             suma_meses=Coalesce(
@@ -103,19 +112,45 @@ def lista_cuentas(request):
             ),
             saldo_calculado=F('vencido') + F('balance_especial') + F('suma_meses'),
         )
+        # Anotar cada periodo individual para poder ordenar por mes
+        for idx, periodo in enumerate(periodos_activos):
+            alias = f'mes_{idx}'
+            clientes = clientes.annotate(**{
+                alias: Coalesce(
+                    Sum('meses__monto', filter=Q(meses__periodo=periodo)),
+                    Value(Decimal('0.00')),
+                    output_field=DecimalField(max_digits=15, decimal_places=2),
+                ),
+            })
+            anotaciones_meses[idx] = alias
     else:
         clientes = clientes.annotate(
             suma_meses=Value(Decimal('0.00'), output_field=DecimalField(max_digits=15, decimal_places=2)),
             saldo_calculado=F('vencido') + F('balance_especial'),
         )
 
-    # Ordenamiento
+    # Ordenamiento — mutuamente excluyente
     orden = request.GET.get('orden', '')
-    if orden == 'saldo_asc':
-        clientes = clientes.order_by('saldo_calculado')
-    elif orden == 'saldo_desc':
-        clientes = clientes.order_by('-saldo_calculado')
-    else:
+    orden_aplicado = False
+    ordenes_validos = {
+        'saldo_asc': 'saldo_calculado',
+        'saldo_desc': '-saldo_calculado',
+        'vencido_asc': 'vencido',
+        'vencido_desc': '-vencido',
+        'balance_asc': 'balance_especial',
+        'balance_desc': '-balance_especial',
+    }
+    # Ordenes dinámicos por mes
+    for idx in range(len(periodos_activos)):
+        alias = anotaciones_meses.get(idx, f'mes_{idx}')
+        ordenes_validos[f'mes{idx}_asc'] = alias
+        ordenes_validos[f'mes{idx}_desc'] = f'-{alias}'
+
+    if orden in ordenes_validos:
+        clientes = clientes.order_by(ordenes_validos[orden])
+        orden_aplicado = True
+
+    if not orden_aplicado:
         clientes = clientes.order_by('nombre')
 
     # Paginación
@@ -125,7 +160,7 @@ def lista_cuentas(request):
 
     filas = _build_tabla(page_obj.object_list, periodos_activos)
 
-    # Calcular totales por columna
+    # Calcular totales por columna (de la página actual)
     totales = {
         'saldo': sum(f['saldo'] for f in filas),
         'vencido': sum(f['vencido'] for f in filas),
@@ -136,6 +171,66 @@ def lista_cuentas(request):
         ] if periodos_activos and filas else [],
     }
 
+    # ── Tablero de control: totales GLOBALES (todos los clientes, no solo la página) ──
+    todos_clientes = ClienteCC.objects.filter(activo=True)
+    if periodos_activos:
+        agg = todos_clientes.aggregate(
+            total_vencido=Coalesce(
+                Sum('vencido'), Value(Decimal('0.00')),
+                output_field=DecimalField(max_digits=15, decimal_places=2),
+            ),
+            total_balance=Coalesce(
+                Sum('balance_especial'), Value(Decimal('0.00')),
+                output_field=DecimalField(max_digits=15, decimal_places=2),
+            ),
+            total_meses=Coalesce(
+                Sum('meses__monto', filter=Q(meses__periodo__in=periodos_activos)),
+                Value(Decimal('0.00')),
+                output_field=DecimalField(max_digits=15, decimal_places=2),
+            ),
+        )
+    else:
+        agg = todos_clientes.aggregate(
+            total_vencido=Coalesce(
+                Sum('vencido'), Value(Decimal('0.00')),
+                output_field=DecimalField(max_digits=15, decimal_places=2),
+            ),
+            total_balance=Coalesce(
+                Sum('balance_especial'), Value(Decimal('0.00')),
+                output_field=DecimalField(max_digits=15, decimal_places=2),
+            ),
+        )
+        agg['total_meses'] = Decimal('0.00')
+
+    dashboard = {
+        'total_saldo': agg['total_vencido'] + agg['total_balance'] + agg['total_meses'],
+        'total_vencido': agg['total_vencido'],
+        'total_balance': agg['total_balance'],
+    }
+
+    # Obtener dólar oficial (venta) desde cotizaciones
+    dolar_venta = _get_dolar_oficial_venta()
+    dashboard['dolar_venta'] = dolar_venta
+    if dolar_venta and dolar_venta > 0:
+        dashboard['total_saldo_usd'] = dashboard['total_saldo'] / dolar_venta
+        dashboard['total_vencido_usd'] = dashboard['total_vencido'] / dolar_venta
+        dashboard['total_balance_usd'] = dashboard['total_balance'] / dolar_venta
+    else:
+        dashboard['total_saldo_usd'] = None
+        dashboard['total_vencido_usd'] = None
+        dashboard['total_balance_usd'] = None
+
+    # Sumatoria estática de facturación del último mes creado
+    ultimo_periodo_config = ConfiguracionMeses.objects.order_by('-orden').first()
+    dashboard['sumatoria_facturacion'] = (
+        ultimo_periodo_config.sumatoria_facturacion
+        if ultimo_periodo_config else Decimal('0.00')
+    )
+    dashboard['periodo_facturacion'] = (
+        _formato_periodo(ultimo_periodo_config.periodo)
+        if ultimo_periodo_config else '—'
+    )
+
     contexto = {
         'filas': filas,
         'encabezados_meses': encabezados_meses,
@@ -144,6 +239,7 @@ def lista_cuentas(request):
         'orden': orden,
         'page_obj': page_obj,
         'totales': totales,
+        'dashboard': dashboard,
     }
     return render(request, 'cuentas_corrientes/lista.html', contexto)
 
@@ -203,14 +299,51 @@ def editar_fila(request):
     for mes in cliente.meses.filter(periodo__in=periodos_activos):
         meses_resp[mes.periodo.isoformat()] = str(mes.monto)
 
+    # Recalcular totales globales para el dashboard
+    todos = ClienteCC.objects.filter(activo=True)
+    if periodos_activos:
+        agg = todos.aggregate(
+            total_vencido=Coalesce(
+                Sum('vencido'), Value(Decimal('0.00')),
+                output_field=DecimalField(max_digits=15, decimal_places=2),
+            ),
+            total_balance=Coalesce(
+                Sum('balance_especial'), Value(Decimal('0.00')),
+                output_field=DecimalField(max_digits=15, decimal_places=2),
+            ),
+            total_meses=Coalesce(
+                Sum('meses__monto', filter=Q(meses__periodo__in=periodos_activos)),
+                Value(Decimal('0.00')),
+                output_field=DecimalField(max_digits=15, decimal_places=2),
+            ),
+        )
+    else:
+        agg = todos.aggregate(
+            total_vencido=Coalesce(
+                Sum('vencido'), Value(Decimal('0.00')),
+                output_field=DecimalField(max_digits=15, decimal_places=2),
+            ),
+            total_balance=Coalesce(
+                Sum('balance_especial'), Value(Decimal('0.00')),
+                output_field=DecimalField(max_digits=15, decimal_places=2),
+            ),
+        )
+        agg['total_meses'] = Decimal('0.00')
+
+    dashboard_totals = {
+        'total_saldo': str(agg['total_vencido'] + agg['total_balance'] + agg['total_meses']),
+        'total_vencido': str(agg['total_vencido']),
+        'total_balance': str(agg['total_balance']),
+    }
+
     return JsonResponse({
         'ok': True,
         'saldo': str(nuevo_saldo),
         'vencido': str(cliente.vencido),
         'balance_especial': str(cliente.balance_especial),
         'meses': meses_resp,
+        'dashboard': dashboard_totals,
     })
-
 
 @login_required
 def nuevo_mes(request):
@@ -279,7 +412,7 @@ def nuevo_mes(request):
         clientes_creados = 0
 
         if mes_corriente_existe:
-            # ── Escenario 2: la columna del mes corriente ya existe ──
+            # Escenario 2: la columna del mes corriente ya existe 
             # Solo sumar facturación a la columna existente.
             with transaction.atomic():
                 for nombre, monto in datos_excel:
@@ -305,6 +438,14 @@ def nuevo_mes(request):
                     procesados += 1
                 # Limpiar huérfanos por si existieran periodos inactivos no eliminados
                 _limpiar_meses_inactivos()
+
+                # Actualizar sumatoria estática de facturación
+                sumatoria = MesCC.objects.filter(
+                    periodo=periodo_corriente
+                ).aggregate(total=Sum('monto'))['total'] or Decimal('0.00')
+                ConfiguracionMeses.objects.filter(
+                    periodo=periodo_corriente
+                ).update(sumatoria_facturacion=sumatoria)
 
             resultado = {
                 'ok': True,
@@ -335,18 +476,13 @@ def nuevo_mes(request):
             periodo_mas_antiguo = periodos_activos[0]['periodo']
 
             with transaction.atomic():
-                # Eliminar configuración del mes más antiguo
                 ConfiguracionMeses.objects.filter(periodo=periodo_mas_antiguo).delete()
-                # Reordenar periodos restantes
                 for config in ConfiguracionMeses.objects.order_by('orden'):
                     if config.orden > 1:
                         config.orden -= 1
                         config.save(update_fields=['orden'])
-                # Crear nueva columna
                 ConfiguracionMeses.objects.create(orden=5, periodo=nuevo_periodo)
-                # Acumular en vencido y eliminar todos los MesCC fuera de los periodos activos
                 _limpiar_meses_inactivos()
-                # Cargar facturación del Excel
                 for nombre, monto in datos_excel:
                     try:
                         cliente = ClienteCC.objects.get(nombre__iexact=nombre)
@@ -359,6 +495,13 @@ def nuevo_mes(request):
                         defaults={'monto': monto},
                     )
                     procesados += 1
+
+                sumatoria = MesCC.objects.filter(
+                    periodo=nuevo_periodo
+                ).aggregate(total=Sum('monto'))['total'] or Decimal('0.00')
+                ConfiguracionMeses.objects.filter(
+                    periodo=nuevo_periodo
+                ).update(sumatoria_facturacion=sumatoria)
 
             resultado = {
                 'ok': True,
@@ -446,13 +589,11 @@ def exportar_excel(request):
 
 
 def _check_admin_staff(user):
-    """Verifica que el usuario sea Administrador y staff."""
     if not (user.rol == 'Administrador' and user.is_staff):
         raise PermissionDenied
 
 
 def _parse_periodo_header(header_str):
-    """Parsea un encabezado de periodo como 'Ene-25' a date(2025, 1, 1)."""
     header_str = str(header_str).strip()
     parts = header_str.split('-')
     if len(parts) != 2:
@@ -472,14 +613,6 @@ def _parse_periodo_header(header_str):
 
 @login_required
 def importar_excel(request):
-    """
-    Importación masiva inicial de cuentas corrientes desde un archivo Excel.
-    Solo disponible para usuarios Administrador + staff.
-
-    El Excel debe tener el mismo formato que la tabla exportada:
-    Cliente | Saldo | Vencido | Balance/Especial | Mes1 | Mes2 | ... | MesN
-    La columna Saldo se ignora (es calculada).
-    """
     _check_admin_staff(request.user)
     resultado = None
 
@@ -497,7 +630,6 @@ def importar_excel(request):
             resultado = {'error': 'No se pudo leer el archivo Excel.'}
             return render(request, 'cuentas_corrientes/importar.html', {'resultado': resultado})
 
-        # Leer encabezados de la primera fila
         rows = list(ws.iter_rows(values_only=True))
         if not rows:
             resultado = {'error': 'El archivo está vacío.'}
@@ -505,7 +637,6 @@ def importar_excel(request):
 
         headers = [str(h).strip() if h else '' for h in rows[0]]
 
-        # Validar columnas mínimas: Cliente, Saldo, Vencido, Balance/Especial
         if len(headers) < 4:
             resultado = {
                 'error': (
@@ -515,14 +646,12 @@ def importar_excel(request):
             }
             return render(request, 'cuentas_corrientes/importar.html', {'resultado': resultado})
 
-        # Parsear columnas de meses (desde la columna 5 en adelante)
         periodos_excel = []
         for i, h in enumerate(headers[4:], start=4):
             periodo = _parse_periodo_header(h)
             if periodo:
                 periodos_excel.append((i, periodo))
 
-        # Leer datos de las filas
         datos_excel = []
         errores_formato = []
         for idx, row in enumerate(rows[1:], start=2):
@@ -532,7 +661,6 @@ def importar_excel(request):
             if not nombre:
                 continue
 
-            # Columna Saldo (índice 1) se ignora — es calculada
             try:
                 vencido = Decimal(str(row[2])) if row[2] is not None else Decimal('0.00')
             except (InvalidOperation, ValueError, IndexError):
@@ -568,14 +696,12 @@ def importar_excel(request):
             resultado = {'error': 'El archivo no contiene datos válidos.'}
             return render(request, 'cuentas_corrientes/importar.html', {'resultado': resultado})
 
-        # Procesar importación dentro de una transacción atómica
         clientes_creados = 0
         clientes_actualizados = 0
         meses_creados = 0
         periodos_configurados = 0
 
         with transaction.atomic():
-            # Crear/actualizar ConfiguracionMeses si hay periodos en el Excel
             if periodos_excel:
                 periodos_existentes = set(
                     ConfiguracionMeses.objects.values_list('periodo', flat=True)

@@ -142,6 +142,10 @@ async function guardarFila(btn) {
             row.querySelector('.btn-save-row').classList.add('d-none');
             row.querySelector('.btn-cancel-row').classList.add('d-none');
             recalcularTotales();
+            // Actualizar dashboard con totales globales del servidor
+            if (data.dashboard) {
+                actualizarDashboard(data.dashboard);
+            }
         } else {
             alert('Error al guardar: ' + (data.error || 'Error desconocido'));
         }
@@ -198,4 +202,29 @@ function recalcularTotales() {
         const mTotal = tfoot.querySelector(`td[data-total="mes-${idx}"]`);
         if (mTotal) mTotal.innerHTML = '<strong>' + formatoAR(total) + '</strong>';
     });
+}
+
+function actualizarDashboard(dashboard) {
+    const rate = (typeof dolarVenta !== 'undefined') ? parseFloat(dolarVenta) : 0;
+
+    const saldo = parseFloat(dashboard.total_saldo) || 0;
+    const vencido = parseFloat(dashboard.total_vencido) || 0;
+    const balance = parseFloat(dashboard.total_balance) || 0;
+
+    const elSaldoArs = document.getElementById('kpi-saldo-ars');
+    const elSaldoUsd = document.getElementById('kpi-saldo-usd');
+    const elVencidoArs = document.getElementById('kpi-vencido-ars');
+    const elVencidoUsd = document.getElementById('kpi-vencido-usd');
+    const elBalanceArs = document.getElementById('kpi-balance-ars');
+    const elBalanceUsd = document.getElementById('kpi-balance-usd');
+
+    if (elSaldoArs) elSaldoArs.textContent = formatoAR(saldo);
+    if (elVencidoArs) elVencidoArs.textContent = formatoAR(vencido);
+    if (elBalanceArs) elBalanceArs.textContent = formatoAR(balance);
+
+    if (rate > 0) {
+        if (elSaldoUsd) elSaldoUsd.textContent = 'USD ' + formatoAR(saldo / rate);
+        if (elVencidoUsd) elVencidoUsd.textContent = 'USD ' + formatoAR(vencido / rate);
+        if (elBalanceUsd) elBalanceUsd.textContent = 'USD ' + formatoAR(balance / rate);
+    }
 }

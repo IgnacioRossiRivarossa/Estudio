@@ -14,3 +14,7 @@ def formato_ar(value):
     formatted = f'{num:,.2f}'
     formatted = formatted.replace(',', 'X').replace('.', ',').replace('X', '.')
     return formatted
+
+@register.simple_tag
+def sort_key_mes(idx, direction):
+    return f'mes{idx}_{direction}'
