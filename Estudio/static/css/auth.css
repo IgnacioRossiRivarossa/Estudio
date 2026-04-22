@@ -1,8 +1,3 @@
-/* ═══════════════════════════════════════════════════════════════
-   auth.css  –  Estilos para páginas de autenticación
-   (login, activate, password_reset, password_reset_confirm)
-   ═══════════════════════════════════════════════════════════════ */
-
 /* ---------- Layout de página completa centrada ---------- */
 .auth-page {
     min-height: 100vh;
@@ -176,10 +171,27 @@
     display: none;
 }
 
-/* ---------- Ocultar navbar y footer en páginas auth ---------- */
+/* ---------- Ocultar navbar, sidebar y footer en páginas auth ---------- */
 .page-auth .navbar-studio,
-.page-auth .footer-studio {
-    display: none;
+.page-auth .footer-studio,
+.page-auth .main-sidebar,
+.page-auth .sidebar-overlay,
+.page-auth .main-header,
+.page-auth .app-layout > .footer-studio {
+    display: none !important;
+}
+
+/* Reset layout for auth pages */
+.page-auth .app-layout {
+    display: block;
+}
+
+.page-auth .main-content {
+    margin-left: 0;
+}
+
+.page-auth .main-content-inner {
+    padding: 0;
 }
 
 .page-auth body {

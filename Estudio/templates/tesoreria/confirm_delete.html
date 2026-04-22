@@ -1,0 +1,32 @@
+{% extends "tesoreria/base_tesoreria.html" %}
+
+{% block tesoreria_content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-xl-5">
+        <div class="card" style="background: var(--bg-secondary); border: 1px solid var(--color-danger-border); border-radius: var(--radius-lg);">
+            <div class="card-header" style="background: var(--color-danger-bg); border-bottom: 1px solid var(--color-danger-border);">
+                <h5 class="mb-0" style="color: var(--color-danger-text);">
+                    <i class="bi bi-exclamation-triangle"></i> {{ titulo }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <p style="color: var(--text-primary);">
+                    ¿Estás seguro de que deseas eliminar <strong>{{ objeto }}</strong>?
+                </p>
+                <p style="color: var(--text-tertiary);">Esta acción no se puede deshacer.</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn-ts btn-ts-danger-filled">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+                        <a href="javascript:history.back()" class="btn-ts btn-ts-secondary">
+                            <i class="bi bi-x-lg"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

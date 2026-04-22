@@ -1,0 +1,39 @@
+{% extends "tesoreria/base_tesoreria.html" %}
+
+{% block tesoreria_content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-6">
+        <div class="card" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
+            <div class="card-header" style="background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color);">
+                <h5 class="mb-0" style="color: var(--text-primary);">{{ titulo }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label" style="color: var(--text-secondary);">
+                            {{ field.label }}
+                        </label>
+                        {{ field }}
+                        {% if field.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in field.errors %}{{ error }}{% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn-ts btn-ts-primary">
+                            <i class="bi bi-check-lg"></i> Guardar
+                        </button>
+                        <a href="javascript:history.back()" class="btn-ts btn-ts-secondary">
+                            <i class="bi bi-x-lg"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

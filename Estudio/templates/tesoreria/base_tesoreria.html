@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Tesorería - Estudio Rivarossa{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/tesoreria.css' %}?v=1.0">
+{% endblock %}
+
+{% block content %}
+<div class="tesoreria-layout">
+    <!-- Sidebar (desktop) -->
+    <aside class="tesoreria-sidebar" id="tesoreriaSidebar">
+        <div class="tesoreria-sidebar-header">
+            <h2 class="tesoreria-sidebar-title">
+                <i class="bi bi-safe2"></i> Tesorería
+            </h2>
+        </div>
+        <nav>
+            <ul class="tesoreria-sidebar-nav">
+                <li>
+                    <a href="{% url 'tesoreria:dashboard' %}"
+                       class="tesoreria-sidebar-link {% if vista_activa == 'dashboard' %}active{% endif %}">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'tesoreria:caja_bancos' %}"
+                       class="tesoreria-sidebar-link {% if vista_activa == 'caja_bancos' %}active{% endif %}">
+                        <i class="bi bi-bank"></i> Caja y Bancos
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'tesoreria:valores_a_depositar' %}"
+                       class="tesoreria-sidebar-link {% if vista_activa == 'valores_a_depositar' %}active{% endif %}">
+                        <i class="bi bi-cash-stack"></i> Valores a Depositar
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'tesoreria:inversiones' %}"
+                       class="tesoreria-sidebar-link {% if vista_activa == 'inversiones' %}active{% endif %}">
+                        <i class="bi bi-graph-up"></i> Inversiones
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main content -->
+    <div class="tesoreria-content">
+        <!-- Mobile toggle -->
+        <button type="button" class="tesoreria-sidebar-toggle" id="tesoreriaSidebarToggle">
+            <i class="bi bi-list"></i> Menú Tesorería
+        </button>
+
+        {% block tesoreria_content %}{% endblock %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* Sidebar mobile toggle */
+(function() {
+    const toggle = document.getElementById('tesoreriaSidebarToggle');
+    const sidebar = document.getElementById('tesoreriaSidebar');
+    if (toggle && sidebar) {
+        toggle.addEventListener('click', function() {
+            sidebar.classList.toggle('show');
+            const icon = toggle.querySelector('i');
+            if (sidebar.classList.contains('show')) {
+                icon.className = 'bi bi-x-lg';
+            } else {
+                icon.className = 'bi bi-list';
+            }
+        });
+    }
+})();
+
+function getCSRFToken() {
+    const name = 'csrftoken';
+    const cookies = document.cookie.split(';');
+    for (let c of cookies) {
+        c = c.trim();
+        if (c.startsWith(name + '=')) return c.substring(name.length + 1);
+    }
+    const input = document.querySelector('[name=csrfmiddlewaretoken]');
+    return input ? input.value : '';
+}
+
+function formatoAR(num) {
+    if (num === null || num === undefined || num === '') return '-';
+    const n = parseFloat(num);
+    if (isNaN(n)) return '-';
+    return n.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+</script>
+{% block tesoreria_js %}{% endblock %}
+{% endblock %}

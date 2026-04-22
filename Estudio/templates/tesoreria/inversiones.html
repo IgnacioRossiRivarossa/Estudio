@@ -1,0 +1,339 @@
+{% extends "tesoreria/base_tesoreria.html" %}
+{% load tesoreria_tags %}
+
+{% block tesoreria_content %}
+<!-- Plazos Fijos -->
+<div class="card mb-4" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
+    <div class="card-header d-flex justify-content-between align-items-center" style="background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color);">
+        <h5 class="mb-0" style="color: var(--text-primary);"><i class="bi bi-lock"></i> Plazos Fijos</h5>
+        <a href="{% url 'tesoreria:pf_crear' %}" class="btn-ts btn-ts-primary">
+            <i class="bi bi-plus-lg"></i> Nuevo
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" style="color: var(--text-primary);">
+                <thead>
+                    <tr style="background: var(--bg-tertiary);">
+                        <th style="color: var(--text-secondary);">Banco</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Monto Invertido</th>
+                        <th class="text-center" style="color: var(--text-secondary);">Fecha Constitución</th>
+                        <th class="text-center" style="color: var(--text-secondary);">Vencimiento</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Interés</th>
+                        <th class="text-center" style="color: var(--text-secondary);">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pf in plazos_fijos %}
+                    <tr>
+                        <td>{{ pf.banco }}</td>
+                        <td class="text-end">{% if pf.monto_invertido %}{{ pf.monto_invertido|formato_ar }}{% else %}-{% endif %}</td>
+                        <td class="text-center">{{ pf.fecha_constitucion|date:"d/m/Y"|default:"-" }}</td>
+                        <td class="text-center">{{ pf.fecha_vencimiento|date:"d/m/Y"|default:"-" }}</td>
+                        <td class="text-end">{% if pf.interes %}{{ pf.interes|formato_ar }}{% else %}-{% endif %}</td>
+                        <td class="text-center">
+                            <a href="{% url 'tesoreria:pf_editar' pf.pk %}" class="btn-ts btn-ts-secondary btn-ts-icon" title="Editar"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'tesoreria:pf_eliminar' pf.pk %}" class="btn-ts btn-ts-danger btn-ts-icon" title="Eliminar"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center" style="color: var(--text-tertiary);">Sin registros</td></tr>
+                    {% endfor %}
+                </tbody>
+                {% if plazos_fijos %}
+                <tfoot>
+                    <tr style="border-top: 2px solid var(--border-color); font-weight: bold;">
+                        <td>TOTAL</td>
+                        <td class="text-end">{{ total_pf|formato_ar }}</td>
+                        <td colspan="4"></td>
+                    </tr>
+                </tfoot>
+                {% endif %}
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- FCI -->
+<div class="card mb-4" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2" style="background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color);">
+        <h5 class="mb-0" style="color: var(--text-primary);"><i class="bi bi-pie-chart"></i> Fondos Comunes de Inversión</h5>
+        <div class="d-flex gap-2 flex-wrap">
+            <button type="button" id="btnActualizarSemanaFCI" class="btn-ts btn-ts-info">
+                <i class="bi bi-calendar-check"></i> Actualizar semana
+            </button>
+            <a href="{% url 'tesoreria:fci_crear' %}" class="btn-ts btn-ts-primary">
+                <i class="bi bi-plus-lg"></i> Nuevo
+            </a>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div id="fciMsg" class="d-none m-3"></div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" style="color: var(--text-primary); font-size: var(--font-size-sm);">
+                <thead>
+                    <tr style="background: var(--bg-tertiary);">
+                        <th style="color: var(--text-secondary);">Nombre</th>
+                        <th style="color: var(--text-secondary);">Banco</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Cuotap. Sem. Ant.</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Saldo Sem. Ant.</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Cuotapartes Actual</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Saldo Actual</th>
+                        <th class="text-center" style="color: var(--text-secondary);">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fci in fcis %}
+                    <tr>
+                        <td>{{ fci.nombre }}</td>
+                        <td>{{ fci.banco }}</td>
+                        <td class="text-end">{% if fci.cuotapartes_sem_ant %}{{ fci.cuotapartes_sem_ant|formato_ar:2 }}{% else %}-{% endif %}</td>
+                        <td class="text-end">{% if fci.saldo_sem_ant %}{{ fci.saldo_sem_ant|formato_ar }}{% else %}-{% endif %}</td>
+                        <td class="text-end">{% if fci.cuotapartes %}{{ fci.cuotapartes|formato_ar:2 }}{% else %}-{% endif %}</td>
+                        <td class="text-end">{% if fci.saldo %}{{ fci.saldo|formato_ar }}{% else %}-{% endif %}</td>
+                        <td class="text-center">
+                            <a href="{% url 'tesoreria:fci_editar' fci.pk %}" class="btn-ts btn-ts-secondary btn-ts-icon" title="Editar"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'tesoreria:fci_eliminar' fci.pk %}" class="btn-ts btn-ts-danger btn-ts-icon" title="Eliminar"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center" style="color: var(--text-tertiary);">Sin registros</td></tr>
+                    {% endfor %}
+                </tbody>
+                {% if fcis %}
+                <tfoot>
+                    <tr style="border-top: 2px solid var(--border-color); font-weight: bold;">
+                        <td colspan="5">TOTAL</td>
+                        <td class="text-end">{{ total_fci|formato_ar }}</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+                {% endif %}
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Títulos y ONs -->
+<div class="card mb-4" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2" style="background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color);">
+        <h5 class="mb-0" style="color: var(--text-primary);"><i class="bi bi-graph-up-arrow"></i> Títulos y ONs</h5>
+        <div class="d-flex gap-2 flex-wrap">
+            <button type="button" id="btnActualizarPrecios" class="btn-ts btn-ts-warning">
+                <i class="bi bi-arrow-repeat"></i> Actualizar precios
+            </button>
+            <button type="button" id="btnActualizarSemana" class="btn-ts btn-ts-info">
+                <i class="bi bi-calendar-check"></i> Actualizar semana
+            </button>
+            <a href="{% url 'tesoreria:titulo_crear' %}" class="btn-ts btn-ts-primary">
+                <i class="bi bi-plus-lg"></i> Nuevo
+            </a>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <!-- Mensaje de resultado -->
+        <div id="titulosMsg" class="d-none m-3"></div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="tablaTitulos" style="color: var(--text-primary); font-size: var(--font-size-sm);">
+                <thead>
+                    <tr style="background: var(--bg-tertiary);">
+                        <th style="color: var(--text-secondary);">Nombre</th>
+                        <th style="color: var(--text-secondary);">Tipo</th>
+                        <th style="color: var(--text-secondary);">Ticker</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Cuotap. Sem. Ant.</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Saldo $ Sem. Ant.</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Saldo USD Sem. Ant.</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Cuotap. Actual</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Saldo $ Actual</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Saldo USD Actual</th>
+                        <th class="text-center" style="color: var(--text-secondary);">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in titulos %}
+                    <tr data-pk="{{ t.pk }}">
+                        <td>{{ t.nombre }}</td>
+                        <td><span class="badge" style="background: {% if t.tipo == 'ON' %}var(--color-purple-alpha-10); color: var(--color-purple-primary){% else %}var(--color-success-bg, #0d3a2a); color: var(--color-success-text){% endif %}; font-size: var(--font-size-xs);">{{ t.tipo }}</span></td>
+                        <td><code>{{ t.ticker }}</code></td>
+                        <td class="text-end">{% if t.cuotapartes_sem_ant %}{{ t.cuotapartes_sem_ant|formato_ar:2 }}{% else %}-{% endif %}</td>
+                        <td class="text-end">{% if t.saldo_pesos_sem_ant %}{{ t.saldo_pesos_sem_ant|formato_ar }}{% else %}-{% endif %}</td>
+                        <td class="text-end">{% if t.saldo_usd_sem_ant %}{{ t.saldo_usd_sem_ant|formato_ar }}{% else %}-{% endif %}</td>
+                        <td class="text-end">{{ t.cuotapartes_actual|formato_ar:2 }}</td>
+                        <td class="text-end td-saldo-pesos">{% if t.saldo_pesos_actual %}{{ t.saldo_pesos_actual|formato_ar }}{% else %}-{% endif %}</td>
+                        <td class="text-end td-saldo-usd">{% if t.saldo_usd_actual %}{{ t.saldo_usd_actual|formato_ar }}{% else %}-{% endif %}</td>
+                        <td class="text-center">
+                            <a href="{% url 'tesoreria:titulo_editar' t.pk %}" class="btn-ts btn-ts-secondary btn-ts-icon" title="Editar"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'tesoreria:titulo_eliminar' t.pk %}" class="btn-ts btn-ts-danger btn-ts-icon" title="Eliminar"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="10" class="text-center" style="color: var(--text-tertiary);">Sin registros</td></tr>
+                    {% endfor %}
+                </tbody>
+                {% if titulos %}
+                <tfoot>
+                    <tr style="border-top: 2px solid var(--border-color); font-weight: bold;">
+                        <td colspan="7">TOTAL</td>
+                        <td class="text-end" id="totalTitulosPesos">{{ total_titulos_pesos|formato_ar }}</td>
+                        <td class="text-end" id="totalTitulosUsd">{{ total_titulos_usd|formato_ar }}</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+                {% endif %}
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Resumen Inversiones -->
+<div class="card" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
+    <div class="card-header" style="background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color);">
+        <h5 class="mb-0" style="color: var(--text-primary);"><i class="bi bi-calculator"></i> Resumen Inversiones</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" style="color: var(--text-primary);">
+                <thead>
+                    <tr style="background: var(--bg-tertiary);">
+                        <th style="color: var(--text-secondary);">Concepto</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Pesos ($)</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Dólares (US$)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Plazos Fijos</td>
+                        <td class="text-end">{{ total_pf|formato_ar }}</td>
+                        <td class="text-end">-</td>
+                    </tr>
+                    <tr>
+                        <td>FCI</td>
+                        <td class="text-end">{{ total_fci|formato_ar }}</td>
+                        <td class="text-end">-</td>
+                    </tr>
+                    <tr>
+                        <td>Títulos / ONs</td>
+                        <td class="text-end">{{ total_titulos_pesos|formato_ar }}</td>
+                        <td class="text-end">{{ total_titulos_usd|formato_ar }}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr style="border-top: 2px solid var(--border-color); font-weight: bold;">
+                        <td>INVERSIONES TOTAL</td>
+                        <td class="text-end" style="color: var(--color-purple-primary);">{{ total_inversiones|formato_ar }}</td>
+                        <td class="text-end" style="color: var(--color-success-text);">{{ total_titulos_usd|formato_ar }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tesoreria_js %}
+<script>
+(function() {
+    const btnPrecios = document.getElementById('btnActualizarPrecios');
+    const btnSemana  = document.getElementById('btnActualizarSemana');
+    const msgDiv     = document.getElementById('titulosMsg');
+
+    function showMsg(text, type) {
+        msgDiv.className = `alert alert-${type} alert-dismissible fade show m-3`;
+        msgDiv.innerHTML = text + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+        msgDiv.classList.remove('d-none');
+        setTimeout(() => msgDiv.classList.add('d-none'), 8000);
+    }
+
+    function ajaxPost(url, btn, originalHtml) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Procesando...';
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCSRFToken(),
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(r => r.json())
+        .then(data => {
+            let msg = `Actualizados: ${data.actualizados}`;
+            if (data.errores && data.errores.length > 0) {
+                msg += `<br><small>Errores: ${data.errores.join(', ')}</small>`;
+                showMsg(msg, 'warning');
+            } else {
+                showMsg(msg, 'success');
+            }
+            setTimeout(() => location.reload(), 1500);
+        })
+        .catch(err => {
+            showMsg('Error de conexión: ' + err.message, 'danger');
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        });
+    }
+
+    if (btnPrecios) {
+        btnPrecios.addEventListener('click', function() {
+            ajaxPost(
+                '{% url "tesoreria:actualizar_precios" %}',
+                btnPrecios,
+                '<i class="bi bi-arrow-repeat"></i> Actualizar precios'
+            );
+        });
+    }
+
+    if (btnSemana) {
+        btnSemana.addEventListener('click', function() {
+            if (!confirm('¿Copiar valores actuales a semana anterior? Esta acción no se puede deshacer.')) return;
+            ajaxPost(
+                '{% url "tesoreria:actualizar_semana" %}',
+                btnSemana,
+                '<i class="bi bi-calendar-check"></i> Actualizar semana'
+            );
+        });
+    }
+
+    // FCI — Actualizar semana
+    const btnSemanaFCI = document.getElementById('btnActualizarSemanaFCI');
+    const fciMsgDiv    = document.getElementById('fciMsg');
+
+    function showFciMsg(text, type) {
+        fciMsgDiv.className = `alert alert-${type} alert-dismissible fade show m-3`;
+        fciMsgDiv.innerHTML = text + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+        fciMsgDiv.classList.remove('d-none');
+        setTimeout(() => fciMsgDiv.classList.add('d-none'), 8000);
+    }
+
+    if (btnSemanaFCI) {
+        btnSemanaFCI.addEventListener('click', function() {
+            if (!confirm('¿Copiar cuotapartes y saldo actuales a semana anterior? Esta acción no se puede deshacer.')) return;
+            btnSemanaFCI.disabled = true;
+            btnSemanaFCI.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Procesando...';
+            fetch('{% url "tesoreria:actualizar_semana_fci" %}', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCSRFToken(), 'Content-Type': 'application/json' },
+            })
+            .then(r => r.json())
+            .then(data => {
+                let msg = `Actualizados: ${data.actualizados}`;
+                if (data.errores && data.errores.length > 0) {
+                    msg += `<br><small>Errores: ${data.errores.join(', ')}</small>`;
+                    showFciMsg(msg, 'warning');
+                } else {
+                    showFciMsg(msg, 'success');
+                }
+                setTimeout(() => location.reload(), 1500);
+            })
+            .catch(err => showFciMsg('Error de conexión: ' + err.message, 'danger'))
+            .finally(() => {
+                btnSemanaFCI.disabled = false;
+                btnSemanaFCI.innerHTML = '<i class="bi bi-calendar-check"></i> Actualizar semana';
+            });
+        });
+    }
+})();
+</script>
+{% endblock %}

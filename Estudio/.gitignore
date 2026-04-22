@@ -6,6 +6,16 @@ env/
 # Variables de entorno
 .env
 
+# Claude
+.CLAUDE.md
+.CLAUDE.md/
+CLAUDE.md
+CLAUDE.md/
+skills
+.skills
+skills/
+.skills/
+
 # Python
 __pycache__/
 *.py[cod]

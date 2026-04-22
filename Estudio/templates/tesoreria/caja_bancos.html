@@ -1,0 +1,221 @@
+{% extends "tesoreria/base_tesoreria.html" %}
+{% load tesoreria_tags %}
+
+{% block tesoreria_content %}
+<!-- Caja -->
+<div class="card mb-4" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
+    <div class="card-header d-flex justify-content-between align-items-center" style="background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color);">
+        <h5 class="mb-0" style="color: var(--text-primary);"><i class="bi bi-cash-coin"></i> Caja</h5>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn-ts btn-ts-warning" id="btnActualizarSamanaCaja" title="Copia el Saldo actual como Saldo Semana Anterior">
+                <i class="bi bi-arrow-clockwise"></i> Actualizar Semana
+            </button>
+            <a href="{% url 'tesoreria:caja_crear' %}" class="btn-ts btn-ts-primary">
+                <i class="bi bi-plus-lg"></i> Nueva
+            </a>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" style="color: var(--text-primary);">
+                <thead>
+                    <tr style="background: var(--bg-tertiary);">
+                        <th style="color: var(--text-secondary);">Empresa</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Saldo Sem. Anterior</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Saldo</th>
+                        <th class="text-center" style="color: var(--text-secondary);">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for caja in cajas %}
+                    <tr>
+                        <td>{{ caja.empresa }}</td>
+                        <td class="text-end" style="color: var(--text-tertiary);">
+                            {% if caja.saldo_sem_ant is not None %}{{ caja.saldo_sem_ant|formato_ar }}{% else %}-{% endif %}
+                        </td>
+                        <td class="text-end {% if caja.saldo < 0 %}text-danger{% endif %}">{{ caja.saldo|formato_ar }}</td>
+                        <td class="text-center">
+                            <a href="{% url 'tesoreria:caja_editar' caja.pk %}" class="btn-ts btn-ts-secondary btn-ts-icon" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center" style="color: var(--text-tertiary);">Sin registros</td></tr>
+                    {% endfor %}
+                </tbody>
+                {% if cajas %}
+                <tfoot>
+                    <tr style="border-top: 2px solid var(--border-color); font-weight: bold;">
+                        <td>TOTAL</td>
+                        <td class="text-end" style="color: var(--text-tertiary);">{{ total_caja_sem_ant|formato_ar }}</td>
+                        <td class="text-end {% if total_caja < 0 %}text-danger{% endif %}">{{ total_caja|formato_ar }}</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+                {% endif %}
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Bancos -->
+<div class="card mb-4" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
+    <div class="card-header d-flex justify-content-between align-items-center" style="background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color);">
+        <h5 class="mb-0" style="color: var(--text-primary);"><i class="bi bi-bank2"></i> Bancos</h5>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn-ts btn-ts-warning" id="btnActualizarSemanaBancos" title="Copia Cta. Cte. + Cheques como Saldo Sem. Ant. $, y Saldo US$ como Saldo Sem. Ant. USD">
+                <i class="bi bi-arrow-clockwise"></i> Actualizar Semana
+            </button>
+            <a href="{% url 'tesoreria:banco_crear' %}" class="btn-ts btn-ts-primary">
+                <i class="bi bi-plus-lg"></i> Nuevo
+            </a>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" style="color: var(--text-primary);">
+                <thead>
+                    <tr style="background: var(--bg-tertiary);">
+                        <th style="color: var(--text-secondary);">Banco</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Saldo Sem. Ant. $</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Saldo Sem. Ant. USD</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Saldo Cta. Cte. $</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Chq. Pend. Acreditar</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Chq. Pend. Débito</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Saldo US$</th>
+                        <th class="text-center" style="color: var(--text-secondary);">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for banco in bancos %}
+                    <tr>
+                        <td>{{ banco.nombre }}</td>
+                        <td class="text-end" style="color: var(--text-tertiary);">
+                            {% if banco.saldo_sem_ant_pesos is not None %}{{ banco.saldo_sem_ant_pesos|formato_ar }}{% else %}-{% endif %}
+                        </td>
+                        <td class="text-end" style="color: var(--text-tertiary);">
+                            {% if banco.saldo_usd_sem_ant is not None %}{{ banco.saldo_usd_sem_ant|formato_ar }}{% else %}-{% endif %}
+                        </td>
+                        <td class="text-end {% if banco.saldo_cuenta_corriente < 0 %}text-danger{% endif %}">{{ banco.saldo_cuenta_corriente|formato_ar }}</td>
+                        <td class="text-end">{% if banco.cheque_pendiente_acreditar %}{{ banco.cheque_pendiente_acreditar|formato_ar }}{% else %}-{% endif %}</td>
+                        <td class="text-end">{% if banco.cheque_pendiente_debito %}{{ banco.cheque_pendiente_debito|formato_ar }}{% else %}-{% endif %}</td>
+                        <td class="text-end">{% if banco.saldo_usd %}{{ banco.saldo_usd|formato_ar }}{% else %}-{% endif %}</td>
+                        <td class="text-center">
+                            <a href="{% url 'tesoreria:banco_editar' banco.pk %}" class="btn-ts btn-ts-secondary btn-ts-icon" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'tesoreria:banco_eliminar' banco.pk %}" class="btn-ts btn-ts-danger btn-ts-icon" title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="8" class="text-center" style="color: var(--text-tertiary);">Sin registros</td></tr>
+                    {% endfor %}
+                </tbody>
+                {% if bancos %}
+                <tfoot>
+                    <tr style="border-top: 2px solid var(--border-color); font-weight: bold;">
+                        <td>TOTAL</td>
+                        <td class="text-end" style="color: var(--text-tertiary);">{{ total_bancos_sem_ant_pesos|formato_ar }}</td>
+                        <td class="text-end" style="color: var(--text-tertiary);">{{ total_bancos_sem_ant_usd|formato_ar }}</td>
+                        <td class="text-end {% if total_bancos_cc < 0 %}text-danger{% endif %}">{{ total_bancos_cc|formato_ar }}</td>
+                        <td class="text-end">{{ total_bancos_chq_acred|formato_ar }}</td>
+                        <td class="text-end">{{ total_bancos_chq_deb|formato_ar }}</td>
+                        <td class="text-end">{{ total_bancos_usd|formato_ar }}</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+                {% endif %}
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Moneda Extranjera -->
+<div class="card mb-4" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
+    <div class="card-header d-flex justify-content-between align-items-center" style="background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color);">
+        <h5 class="mb-0" style="color: var(--text-primary);"><i class="bi bi-currency-exchange"></i> Moneda Extranjera</h5>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn-ts btn-ts-warning" id="btnActualizarSamanaME" title="Copia el Saldo US$ actual como Saldo Semana Anterior">
+                <i class="bi bi-arrow-clockwise"></i> Actualizar Semana
+            </button>
+            <a href="{% url 'tesoreria:moneda_extranjera_crear' %}" class="btn-ts btn-ts-primary">
+                <i class="bi bi-plus-lg"></i> Nueva
+            </a>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" style="color: var(--text-primary);">
+                <thead>
+                    <tr style="background: var(--bg-tertiary);">
+                        <th style="color: var(--text-secondary);">Empresa</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Saldo Sem. Anterior US$</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Dólares (US$)</th>
+                        <th class="text-center" style="color: var(--text-secondary);">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for me in monedas %}
+                    <tr>
+                        <td>{{ me.empresa }}</td>
+                        <td class="text-end" style="color: var(--text-tertiary);">
+                            {% if me.saldo_dolares_sem_ant is not None %}{{ me.saldo_dolares_sem_ant|formato_ar }}{% else %}-{% endif %}
+                        </td>
+                        <td class="text-end">{{ me.saldo_dolares|formato_ar }}</td>
+                        <td class="text-center">
+                            <a href="{% url 'tesoreria:moneda_extranjera_editar' me.pk %}" class="btn-ts btn-ts-secondary btn-ts-icon" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'tesoreria:moneda_extranjera_eliminar' me.pk %}" class="btn-ts btn-ts-danger btn-ts-icon" title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center" style="color: var(--text-tertiary);">Sin registros</td></tr>
+                    {% endfor %}
+                </tbody>
+                {% if monedas %}
+                <tfoot>
+                    <tr style="border-top: 2px solid var(--border-color); font-weight: bold;">
+                        <td>TOTAL</td>
+                        <td class="text-end" style="color: var(--text-tertiary);">{{ total_me_sem_ant|formato_ar }}</td>
+                        <td class="text-end">{{ total_me|formato_ar }}</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+                {% endif %}
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tesoreria_js %}
+<script>
+(function() {
+    function actualizarSemana(url, btnId) {
+        const btn = document.getElementById(btnId);
+        if (!btn) return;
+        btn.addEventListener('click', function() {
+            if (!confirm('¿Confirmar actualización de semana? Se sobreescribirá el saldo de la semana anterior.')) return;
+            btn.disabled = true;
+            fetch(url, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCSRFToken(), 'Content-Type': 'application/json' },
+            })
+            .then(r => r.json())
+            .then(() => location.reload())
+            .catch(() => { alert('Error al actualizar. Intente nuevamente.'); btn.disabled = false; });
+        });
+    }
+
+    actualizarSemana("{% url 'tesoreria:actualizar_semana_caja' %}", 'btnActualizarSamanaCaja');
+    actualizarSemana("{% url 'tesoreria:actualizar_semana_bancos' %}", 'btnActualizarSemanaBancos');
+    actualizarSemana("{% url 'tesoreria:actualizar_semana_me' %}", 'btnActualizarSamanaME');
+})();
+</script>
+{% endblock %}

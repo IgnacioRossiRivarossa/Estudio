@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"C:/Proyectos/-Sistemas/Estudio/Estudio/tesoreria/migrations\")",
+      "Bash(mkdir -p \"C:/Proyectos/-Sistemas/Estudio/Estudio/templates/tesoreria\")",
+      "Bash(python manage.py makemigrations tesoreria)",
+      "Bash(python manage.py migrate tesoreria)",
+      "Bash(python manage.py check)",
+      "Bash(python -c \":*)",
+      "Bash(python manage.py shell -c \":*)",
+      "Bash(python manage.py check --deploy)",
+      "Bash(python -c \"from tesoreria.templatetags.tesoreria_tags import formato_ar; print\\(formato_ar\\(''1234567.89''\\)\\); print\\(formato_ar\\(''0''\\)\\); print\\(formato_ar\\(None\\)\\)\")",
+      "Bash(python -c \"from django.test.utils import setup_test_environment; setup_test_environment\\(\\); import django; django.setup\\(\\); from django.urls import reverse; print\\(reverse\\(''''tesoreria:banco_crear''''\\)\\); print\\(reverse\\(''''tesoreria:banco_eliminar'''', args=[1]\\)\\); print\\(reverse\\(''''tesoreria:moneda_extranjera_crear''''\\)\\); print\\(reverse\\(''''tesoreria:fci_crear''''\\)\\); print\\(reverse\\(''''tesoreria:fci_eliminar'''', args=[1]\\)\\)\")",
+      "Bash(python manage.py shell -c \"from django.urls import reverse; print\\(reverse\\(''tesoreria:banco_crear''\\)\\); print\\(reverse\\(''tesoreria:banco_eliminar'', args=[1]\\)\\); print\\(reverse\\(''tesoreria:moneda_extranjera_crear''\\)\\); print\\(reverse\\(''tesoreria:fci_crear''\\)\\); print\\(reverse\\(''tesoreria:fci_eliminar'', args=[1]\\)\\)\")",
+      "Bash(python manage.py shell -c \"from django.conf import settings; print\\(repr\\(settings.IOL_USUARIO\\)\\); print\\(repr\\(settings.IOL_PASSWORD\\)\\)\")",
+      "Bash(python manage.py shell -c \"from django.conf import settings; print\\(repr\\(settings.IOL_USUARIO\\)\\); print\\(''password set:'', settings.IOL_PASSWORD is not None\\)\")"
+    ]
+  }
+}

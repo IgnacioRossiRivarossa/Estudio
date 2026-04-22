@@ -18,15 +18,14 @@ DJANGO_APPS = [
     'django.contrib.sitemaps',
 ]
 
-THIRD_PARTY_APPS = [
-    'django_cleanup.apps.CleanupConfig',  
-]
+THIRD_PARTY_APPS = []
 
 LOCAL_APPS = [
     'usuarios.apps.UsuariosConfig',
     'clientes.apps.ClientesConfig',
     'cotizaciones.apps.CotizacionesConfig',
     'cuentas_corrientes.apps.CuentasCorrientesConfig',
+    'tesoreria.apps.TesoreriaConfig',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
@@ -211,6 +210,12 @@ if not DEBUG:
     X_FRAME_OPTIONS = 'DENY'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# InvertirOnLine (IOL) API — Títulos y ONs
+IOL_USUARIO = config('IOL_USUARIO', default=None)
+IOL_PASSWORD = config('IOL_PASSWORD', default=None)
+IOL_BASE_URL = 'https://api.invertironline.com'
+IOL_MAX_WORKERS = 10
 
 import logging as _logging
 _render_logger = _logging.getLogger(__name__)

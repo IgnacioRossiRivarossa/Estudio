@@ -1,0 +1,225 @@
+{% extends "tesoreria/base_tesoreria.html" %}
+{% load static %}
+{% load tesoreria_tags %}
+
+{% block tesoreria_content %}
+<div class="row">
+    <!-- Tabla por empresa -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
+            <div class="card-header d-flex justify-content-between align-items-center" style="background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color);">
+                <h5 class="mb-0" style="color: var(--text-primary);"><i class="bi bi-building"></i> Por Empresa</h5>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn-ts btn-ts-warning" id="btnActualizarSamanaVAD" title="Copia el Saldo actual como Saldo Semana Anterior por empresa">
+                        <i class="bi bi-arrow-clockwise"></i> Actualizar Semana
+                    </button>
+                    <a href="{% url 'tesoreria:vad_crear' %}" class="btn-ts btn-ts-primary">
+                        <i class="bi bi-plus-lg"></i> Nuevo
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" style="color: var(--text-primary);">
+                        <thead>
+                            <tr style="background: var(--bg-tertiary);">
+                                <th style="color: var(--text-secondary);">Empresa</th>
+                                <th class="text-end" style="color: var(--text-secondary);">Saldo Sem. Anterior</th>
+                                <th class="text-end" style="color: var(--text-secondary);">Saldo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in total_por_empresa %}
+                            <tr>
+                                <td>{{ item.empresa }}</td>
+                                <td class="text-end" style="color: var(--text-tertiary);">
+                                    {% with sem_ant=vad_sem_ant_map|get_item:item.empresa %}
+                                        {% if sem_ant is not None %}{{ sem_ant|formato_ar }}{% else %}-{% endif %}
+                                    {% endwith %}
+                                </td>
+                                <td class="text-end">{{ item.total|formato_ar }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="3" class="text-center" style="color: var(--text-tertiary);">Sin registros</td></tr>
+                            {% endfor %}
+                        </tbody>
+                        {% if total_por_empresa %}
+                        <tfoot>
+                            <tr style="border-top: 2px solid var(--border-color); font-weight: bold;">
+                                <td>TOTAL</td>
+                                <td></td>
+                                <td class="text-end">{{ total_vad|formato_ar }}</td>
+                            </tr>
+                        </tfoot>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico de torta -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
+            <div class="card-header" style="background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color);">
+                <h5 class="mb-0" style="color: var(--text-primary);"><i class="bi bi-pie-chart"></i> Distribución por Mes</h5>
+            </div>
+            <div class="card-body d-flex align-items-center justify-content-center">
+                <canvas id="chartVAD" style="max-height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de vencimientos -->
+<div class="card mb-4" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
+    <div class="card-header" style="background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color);">
+        <h5 class="mb-0" style="color: var(--text-primary);"><i class="bi bi-calendar3"></i> Vencimientos por Mes</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" style="color: var(--text-primary);">
+                <thead>
+                    <tr style="background: var(--bg-tertiary);">
+                        <th style="color: var(--text-secondary);">Mes</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in total_por_mes %}
+                    <tr>
+                        <td>{{ item.mes_vencimiento }} {{ item.anio_vencimiento }}</td>
+                        <td class="text-end">{{ item.total|formato_ar }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="2" class="text-center" style="color: var(--text-tertiary);">Sin registros</td></tr>
+                    {% endfor %}
+                </tbody>
+                {% if total_por_mes %}
+                <tfoot>
+                    <tr style="border-top: 2px solid var(--border-color); font-weight: bold;">
+                        <td>TOTAL</td>
+                        <td class="text-end">{{ total_vad|formato_ar }}</td>
+                    </tr>
+                </tfoot>
+                {% endif %}
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Detalle individual -->
+<div class="card mb-4" style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
+    <div class="card-header" style="background: var(--bg-tertiary); border-bottom: 1px solid var(--border-color);">
+        <h5 class="mb-0" style="color: var(--text-primary);"><i class="bi bi-list-ul"></i> Detalle</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" style="color: var(--text-primary);">
+                <thead>
+                    <tr style="background: var(--bg-tertiary);">
+                        <th style="color: var(--text-secondary);">Empresa</th>
+                        <th style="color: var(--text-secondary);">Mes Vencimiento</th>
+                        <th class="text-end" style="color: var(--text-secondary);">Monto</th>
+                        <th class="text-center" style="color: var(--text-secondary);">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in valores %}
+                    <tr>
+                        <td>{{ v.empresa }}</td>
+                        <td>{{ v.mes_vencimiento }} {{ v.anio_vencimiento }}</td>
+                        <td class="text-end">{{ v.monto|formato_ar }}</td>
+                        <td class="text-center">
+                            <a href="{% url 'tesoreria:vad_editar' v.pk %}" class="btn-ts btn-ts-secondary btn-ts-icon" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'tesoreria:vad_eliminar' v.pk %}" class="btn-ts btn-ts-danger btn-ts-icon" title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center" style="color: var(--text-tertiary);">Sin registros</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tesoreria_js %}
+<script>
+(function() {
+    const btn = document.getElementById('btnActualizarSamanaVAD');
+    if (!btn) return;
+    btn.addEventListener('click', function() {
+        if (!confirm('¿Confirmar actualización de semana? Se sobreescribirá el saldo de la semana anterior por empresa.')) return;
+        btn.disabled = true;
+        fetch("{% url 'tesoreria:actualizar_semana_vad' %}", {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCSRFToken(), 'Content-Type': 'application/json' },
+        })
+        .then(r => r.json())
+        .then(() => location.reload())
+        .catch(() => { alert('Error al actualizar. Intente nuevamente.'); btn.disabled = false; });
+    });
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+(function() {
+    const labels = {{ chart_labels|safe }};
+    const values = {{ chart_values|safe }};
+
+    if (!labels.length) return;
+
+    const colors = [
+        'rgba(140, 79, 159, 0.8)',
+        'rgba(255, 193, 7, 0.8)',
+        'rgba(25, 135, 84, 0.8)',
+        'rgba(220, 53, 69, 0.8)',
+        'rgba(13, 110, 253, 0.8)',
+        'rgba(253, 126, 20, 0.8)',
+        'rgba(111, 66, 193, 0.8)',
+        'rgba(32, 201, 151, 0.8)',
+    ];
+
+    const ctx = document.getElementById('chartVAD').getContext('2d');
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: colors.slice(0, labels.length),
+                borderWidth: 1,
+                borderColor: getComputedStyle(document.documentElement).getPropertyValue('--bg-secondary').trim(),
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim(),
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            const val = ctx.parsed;
+                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                            const pct = ((val / total) * 100).toFixed(1);
+                            return `${ctx.label}: $ ${val.toLocaleString('es-AR', {minimumFractionDigits: 2})} (${pct}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+})();
+</script>
+{% endblock %}
