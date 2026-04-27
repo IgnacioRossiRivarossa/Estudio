@@ -112,14 +112,29 @@ async function guardarFila(btn) {
     cancelBtn.disabled = true;
 
     try {
-        const response = await fetch(editarFilaUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCSRFToken(),
-            },
-            body: JSON.stringify(payload),
-        });
+        let response;
+        try {
+            console.log('[CC] fetch →', editarFilaUrl, payload);
+            response = await fetch(editarFilaUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(),
+                },
+                body: JSON.stringify(payload),
+            });
+        } catch (networkError) {
+            console.error('[CC] fetch falló:', networkError);
+            alert('Error al guardar.\nDetalle: ' + networkError.name + ': ' + networkError.message + '\nURL: ' + editarFilaUrl);
+            return;
+        }
+
+        if (!response.ok) {
+            const texto = await response.text().catch(() => '');
+            console.error('Error HTTP', response.status, texto.substring(0, 300));
+            alert(`Error del servidor (${response.status}). Revise la consola del navegador.`);
+            return;
+        }
 
         const data = await response.json();
 
@@ -138,11 +153,11 @@ async function guardarFila(btn) {
             });
             const saldoCell = row.querySelector('td[data-field="saldo"]');
             saldoCell.textContent = formatoAR(data.saldo);
+            recalcularMorosidad(row);
             row.querySelector('.btn-edit-row').classList.remove('d-none');
             row.querySelector('.btn-save-row').classList.add('d-none');
             row.querySelector('.btn-cancel-row').classList.add('d-none');
             recalcularTotales();
-            // Actualizar dashboard con totales globales del servidor
             if (data.dashboard) {
                 actualizarDashboard(data.dashboard);
             }
@@ -150,12 +165,53 @@ async function guardarFila(btn) {
             alert('Error al guardar: ' + (data.error || 'Error desconocido'));
         }
     } catch (error) {
-        alert('Error de conexión al guardar los cambios.');
-        console.error('Error:', error);
+        console.error('Error inesperado en guardarFila:', error);
+        alert('Error inesperado: ' + error.message);
     } finally {
         btn.disabled = false;
         cancelBtn.disabled = false;
     }
+}
+
+function morosidadBadge(pct) {
+    const formatted = pct.toFixed(1) + '%';
+    if (pct <= 30)  return `<span class="morosidad-badge morosidad-baja">${formatted}</span>`;
+    if (pct <= 60)  return `<span class="morosidad-badge morosidad-media">${formatted}</span>`;
+    if (pct <= 100) return `<span class="morosidad-badge morosidad-alta">${formatted}</span>`;
+    return `<span class="morosidad-badge morosidad-critica">${formatted}</span>`;
+}
+
+function recalcularMorosidad(row) {
+    const morosidadCell = row.querySelector('td[data-field="morosidad"]');
+    if (!morosidadCell) return;
+
+    const saldoCell   = row.querySelector('td[data-field="saldo"]');
+    const balanceCell = row.querySelector('td[data-field="balance_especial"]');
+    const vencidoCell = row.querySelector('td[data-field="vencido"]');
+    const mesCells    = row.querySelectorAll('td[data-field="mes"]');
+
+    const saldo = parsearAR(saldoCell.textContent);
+
+    // Si saldo es 0, morosidad es 0 directamente
+    if (saldo === 0) {
+        morosidadCell.innerHTML = morosidadBadge(0);
+        return;
+    }
+
+    const balance = parseFloat(balanceCell.dataset.value) || 0;
+    const vencido = parseFloat(vencidoCell.dataset.value) || 0;
+    // Orden 1 y 2 son los dos primeros meses (los más antiguos)
+    const mes0 = mesCells.length > 0 ? (parseFloat(mesCells[0].dataset.value) || 0) : 0;
+    const mes1 = mesCells.length > 1 ? (parseFloat(mesCells[1].dataset.value) || 0) : 0;
+
+    const denominador = saldo - balance;
+    if (denominador === 0) {
+        morosidadCell.innerHTML = '<span class="morosidad-na">—</span>';
+        return;
+    }
+
+    const morosidad = ((vencido + mes0 + mes1) / denominador) * 100;
+    morosidadCell.innerHTML = morosidadBadge(morosidad);
 }
 
 function recalcularTotales() {

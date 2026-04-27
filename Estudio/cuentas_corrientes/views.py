@@ -49,17 +49,17 @@ def _limpiar_meses_inactivos():
 def _formato_periodo(periodo):
     return f'{MESES_ES.get(periodo.month, "?")}-{str(periodo.year)[2:]}'
 
-def _get_dolar_oficial_venta():
+def _get_dolar_mep_venta():
     try:
         from cotizaciones.services import get_dolares
         dolares = get_dolares()
         for d in dolares:
-            if d.get('casa') == 'oficial':
+            if d.get('casa') == 'bolsa':
                 venta = d.get('venta')
                 if venta is not None:
                     return Decimal(str(venta))
     except Exception:
-        logger.warning('No se pudo obtener el dólar oficial.')
+        logger.warning('No se pudo obtener el dólar MEP.')
     return None
 
 def _build_tabla(clientes, periodos_activos):
@@ -79,12 +79,23 @@ def _build_tabla(clientes, periodos_activos):
         suma_meses = sum(m['monto'] for m in meses_valores)
         saldo = cliente.vencido + cliente.balance_especial + suma_meses
 
+        # Morosidad: (vencido + mes_orden1 + mes_orden2) / (saldo - balance_especial) * 100
+        if saldo == 0:
+            morosidad = Decimal('0.00')
+        else:
+            denominador = saldo - cliente.balance_especial  # = vencido + suma_meses
+            monto_orden1 = meses_valores[0]['monto'] if len(meses_valores) > 0 else Decimal('0.00')
+            monto_orden2 = meses_valores[1]['monto'] if len(meses_valores) > 1 else Decimal('0.00')
+            numerador = cliente.vencido + monto_orden1 + monto_orden2
+            morosidad = (numerador / denominador * 100) if denominador != 0 else None
+
         filas.append({
             'cliente': cliente,
             'saldo': saldo,
             'vencido': cliente.vencido,
             'balance_especial': cliente.balance_especial,
             'meses': meses_valores,
+            'morosidad': morosidad,
         })
     return filas
 
@@ -208,8 +219,8 @@ def lista_cuentas(request):
         'total_balance': agg['total_balance'],
     }
 
-    # Obtener dólar oficial (venta) desde cotizaciones
-    dolar_venta = _get_dolar_oficial_venta()
+    # Obtener dólar MEP/bolsa (venta) desde cotizaciones
+    dolar_venta = _get_dolar_mep_venta()
     dashboard['dolar_venta'] = dolar_venta
     if dolar_venta and dolar_venta > 0:
         dashboard['total_saldo_usd'] = dashboard['total_saldo'] / dolar_venta
