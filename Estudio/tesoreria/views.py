@@ -230,8 +230,11 @@ def actualizar_precios_titulos(request):
     if not titulos.exists():
         return JsonResponse({"actualizados": 0, "errores": ["No hay títulos cargados."]})
 
+    # Separar los que tienen precio manual (no se consultan en IOL)
+    titulos_iol = [t for t in titulos if not t.precio_manual]
+
     tickers_a_consultar = set()
-    for t in titulos:
+    for t in titulos_iol:
         es_panama = "panama" in t.nombre.lower()
         ticker = t.ticker.upper()
         if es_panama:
@@ -262,8 +265,9 @@ def actualizar_precios_titulos(request):
     dolar_mep = _get_dolar_mep()
     dolar_mep_venta = Decimal(str(dolar_mep.get('venta', 0))) if dolar_mep else Decimal('0')
 
+    manuales_omitidos = len(titulos) - len(titulos_iol)
     actualizados = 0
-    for t in titulos:
+    for t in titulos_iol:
         es_panama = "panama" in t.nombre.lower()
         ticker = t.ticker.upper()
         try:
@@ -352,7 +356,11 @@ def actualizar_precios_titulos(request):
         except (InvalidOperation, Exception) as e:
             errores.append(f"{t.ticker}: error al guardar — {e}")
 
-    return JsonResponse({"actualizados": actualizados, "errores": errores})
+    return JsonResponse({
+        "actualizados": actualizados,
+        "errores": errores,
+        "manuales_omitidos": manuales_omitidos,
+    })
 
 @login_required
 @require_POST

@@ -13,7 +13,8 @@
       "Bash(python -c \"from django.test.utils import setup_test_environment; setup_test_environment\\(\\); import django; django.setup\\(\\); from django.urls import reverse; print\\(reverse\\(''''tesoreria:banco_crear''''\\)\\); print\\(reverse\\(''''tesoreria:banco_eliminar'''', args=[1]\\)\\); print\\(reverse\\(''''tesoreria:moneda_extranjera_crear''''\\)\\); print\\(reverse\\(''''tesoreria:fci_crear''''\\)\\); print\\(reverse\\(''''tesoreria:fci_eliminar'''', args=[1]\\)\\)\")",
       "Bash(python manage.py shell -c \"from django.urls import reverse; print\\(reverse\\(''tesoreria:banco_crear''\\)\\); print\\(reverse\\(''tesoreria:banco_eliminar'', args=[1]\\)\\); print\\(reverse\\(''tesoreria:moneda_extranjera_crear''\\)\\); print\\(reverse\\(''tesoreria:fci_crear''\\)\\); print\\(reverse\\(''tesoreria:fci_eliminar'', args=[1]\\)\\)\")",
       "Bash(python manage.py shell -c \"from django.conf import settings; print\\(repr\\(settings.IOL_USUARIO\\)\\); print\\(repr\\(settings.IOL_PASSWORD\\)\\)\")",
-      "Bash(python manage.py shell -c \"from django.conf import settings; print\\(repr\\(settings.IOL_USUARIO\\)\\); print\\(''password set:'', settings.IOL_PASSWORD is not None\\)\")"
+      "Bash(python manage.py shell -c \"from django.conf import settings; print\\(repr\\(settings.IOL_USUARIO\\)\\); print\\(''password set:'', settings.IOL_PASSWORD is not None\\)\")",
+      "Bash(python manage.py makemigrations tesoreria --name add_precio_manual_to_tituloon)"
     ]
   }
 }

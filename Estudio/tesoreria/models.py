@@ -157,6 +157,10 @@ class TituloON(models.Model):
     valor_cierre_usd = models.DecimalField(
         max_digits=15, decimal_places=6, blank=True, null=True
     )
+    precio_manual = models.BooleanField(
+        default=False,
+        help_text="Marcar si el precio no se obtiene de IOL y debe cargarse manualmente."
+    )
     class Meta:
         verbose_name = 'Título / ON'
         verbose_name_plural = 'Títulos / ONs'
